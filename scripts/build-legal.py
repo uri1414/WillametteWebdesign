@@ -119,6 +119,34 @@ def build(doc, kind, lang, cfg, css, today):
         "dateModified": today,
     }
 
+    # Deferred to first interaction or 3s idle, same as every other page
+    # (handbook 2.6) -- a blocking gtag.js in <head> is ~66 KB of main-thread
+    # work for data nobody needs in the first 3 seconds, and TBT is 30% of
+    # the Lighthouse score. Omitted entirely if no ID is configured yet.
+    ga4 = (cfg.get("analytics") or {}).get("ga4MeasurementId") or ""
+    analytics = ""
+    if ga4:
+        analytics = f"""
+<script>
+(function(){{
+  var ID='{ga4}';
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){{dataLayer.push(arguments);}}
+  window.gtag=gtag; gtag('js',new Date()); gtag('config',ID);
+  var done=false;
+  function load(){{
+    if(done)return; done=true;
+    var s=document.createElement('script');
+    s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+ID;
+    document.head.appendChild(s);
+  }}
+  ['scroll','mousemove','touchstart','click','keydown'].forEach(function(e){{
+    window.addEventListener(e,load,{{once:true,passive:true}});
+  }});
+  setTimeout(load,3000);
+}})();
+</script>"""
+
     return f"""<!doctype html>
 <html lang="{lang}">
 <head>
@@ -171,6 +199,7 @@ def build(doc, kind, lang, cfg, css, today):
 .legal-foot {{ margin-top:56px; padding-top:24px; border-top:1px solid var(--border-rule); display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center; }}
 .legal-foot p {{ margin:0; font-size:13px; color:var(--text-muted); }}
 </style>
+{analytics}
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>
 </head>
 <body>

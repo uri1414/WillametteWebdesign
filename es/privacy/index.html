@@ -50,6 +50,26 @@
 .legal-foot { margin-top:56px; padding-top:24px; border-top:1px solid var(--border-rule); display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center; }
 .legal-foot p { margin:0; font-size:13px; color:var(--text-muted); }
 </style>
+
+<script>
+(function(){
+  var ID='G-8JKN9HRENP';
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  window.gtag=gtag; gtag('js',new Date()); gtag('config',ID);
+  var done=false;
+  function load(){
+    if(done)return; done=true;
+    var s=document.createElement('script');
+    s.async=true; s.src='https://www.googletagmanager.com/gtag/js?id='+ID;
+    document.head.appendChild(s);
+  }
+  ['scroll','mousemove','touchstart','click','keydown'].forEach(function(e){
+    window.addEventListener(e,load,{once:true,passive:true});
+  });
+  setTimeout(load,3000);
+})();
+</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Política de Privacidad","url":"https://willametteweb.com/es/privacy/","inLanguage":"es-US","isPartOf":{"@id":"https://willametteweb.com/#website"},"publisher":{"@id":"https://willametteweb.com/#organization"},"dateModified":"2026-08-25"}</script>
 </head>
 <body>

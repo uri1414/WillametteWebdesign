@@ -57,8 +57,7 @@
     "linkedin": null
   },
   "analytics": {
-    "ga4MeasurementId": null,
-    "_todo": "New GA4 property for willametteweb.com. Load it deferred per handbook §2.6 — never a blocking gtag.js in <head>.",
+    "ga4MeasurementId": "G-8JKN9HRENP",
     "searchConsoleVerified": false,
     "bingWebmasterVerified": false
   },

@@ -124,8 +124,11 @@ whether the page earns anything.
 ## Gate 6 — Register (post-launch, day one)
 
 - [ ] Google Search Console verified + sitemap submitted
-- [ ] GA4 property created for `willametteweb.com` (new — not Baseline's),
-      ID set in `site.config.json`, loading deferred
+- [x] GA4 property created for `willametteweb.com` (new — not Baseline's),
+      ID set in `site.config.json` (`G-8JKN9HRENP`), loading deferred to
+      interaction/idle on every page including privacy/terms. Verified in a
+      real browser: gtag.js does not request until the first interaction.
+- [ ] Confirm real traffic is landing in the GA4 property (Realtime report)
 - [ ] Bing Webmaster Tools verified
 - [ ] **Google Business Profile** created, verified, filled completely
       (categories, services, hours, service area, photos), linked from the
