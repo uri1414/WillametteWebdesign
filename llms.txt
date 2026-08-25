@@ -1,0 +1,39 @@
+# Willamette Web Design
+
+> Web design and development studio serving businesses in the Willamette Valley,
+> Oregon. Full-service: strategy, design, build, and ongoing care.
+
+## Contact
+
+- Website: https://willametteweb.com
+- Email: info@willametteweb.com
+- Phone: (541) 497-9531
+
+## About
+
+<!--
+  PLACEHOLDER — awaiting the new business model.
+
+  llms.txt is a plain-text summary that AI answer engines (ChatGPT, Perplexity,
+  Google AI Overviews) can quote directly (handbook §5). It works because it is
+  clean, factual, and self-contained — so it must be accurate, not aspirational.
+
+  Fill in from the business plan, not from Baseline Studio's old copy. The
+  business model changed; carrying over the old services/pricing would publish
+  claims that are no longer true.
+
+  Required sections once the plan is final:
+    ## Services      — one line per service, what it is and who it's for
+    ## Pricing       — real structure; omit entirely rather than guess
+    ## Service area  — the actual cities served
+    ## Process       — the real engagement steps
+
+  Honesty rules (handbook §9) apply here exactly as on the site:
+  no invented credentials, review counts, years in business, or client names.
+-->
+
+## Service area
+
+Willamette Valley, Oregon.
+<!-- TODO: list the real cities once confirmed. The (541) area code covers
+     Eugene / Corvallis / Albany / Bend — not Salem (503/971). -->

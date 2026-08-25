@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.netlify/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+
+# Build + audit output (regenerated; not served)
+/reports/
+*.log
+
+# Original full-resolution source images. Keep the masters OUT of the deploy —
+# only the generated AVIF/WebP derivatives in assets/img/ ship.
+/assets/img/_src/
+
+# Python
+__pycache__/
+*.pyc

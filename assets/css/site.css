@@ -1,0 +1,132 @@
+/* ===========================================================================
+   Willamette Web Design — source stylesheet
+
+   This file is MINIFIED AND INLINED into every page by `npm run css`, which
+   replaces the contents of each page's <style id="site-css"> block. Pages do
+   not link to it at runtime — an external stylesheet is render-blocking, and
+   on mobile that is a full round-trip before anything paints (handbook §2.4).
+
+   Edit here, then run `npm run css`. `npm run css:check` verifies pages are
+   in sync and is part of `npm run preflight`.
+
+   ---------------------------------------------------------------------------
+   BRAND TOKENS ARE PLACEHOLDERS.
+
+   The owner is designing the identity and will send the homepage code. The
+   neutral values below exist so the 404 page and any scaffolding render
+   sensibly — they are NOT a proposed palette. Replace them wholesale when the
+   real brand lands; do not treat them as a starting point to nudge.
+   =========================================================================== */
+
+:root {
+  /* --- Placeholder neutrals (replace with the real brand) --- */
+  --ink: #14181a;
+  --body: #4a5560;
+  --muted: #7b8794;
+  --paper: #fbfaf8;
+  --line: #e6e8ea;
+  --brand: #14181a;
+
+  /* --- Typography ---
+     Self-hosted woff2 only. Never fonts.googleapis.com (handbook §2.5).
+     Add @font-face blocks here once the typefaces are chosen, request only
+     the weights actually used, and always set font-display: swap. */
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-body);
+
+  /* --- Scale --- */
+  --wrap: 1120px;
+  --radius: 14px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+/* --- Reset --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  color: var(--body);
+  background: var(--paper);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  line-height: 1.12;
+  letter-spacing: -.02em;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Images default to responsive + never overflow their column. Explicit
+   width/height still go on every <img> — they reserve layout space and are
+   what actually protects CLS. */
+img { max-width: 100%; height: auto; display: block; }
+
+/* --- Layout --- */
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 24px; }
+
+/* --- Skip link (keyboard + screen-reader entry point) --- */
+.skip { position: absolute; left: -9999px; }
+.skip:focus {
+  left: 16px; top: 12px; z-index: 99;
+  background: var(--paper); color: var(--ink);
+  padding: 10px 16px; border-radius: 8px; border: 1px solid var(--line);
+}
+
+/* --- Focus visibility: never remove it, only restyle it --- */
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* --- Motion: honour the OS setting (handbook accessibility bar) --- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* ===========================================================================
+   COMPONENTS — shared across pages.
+
+   Anything used on more than one page belongs here, not in a page's local
+   block. Page-specific rules go in that page's <style id="page-css"> block,
+   which `npm run css` deliberately leaves alone.
+   =========================================================================== */
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform .2s var(--ease), background .2s, border-color .2s, color .2s;
+}
+.btn:hover { transform: translateY(-1px); }
+
+.btn-p { background: var(--brand); color: var(--paper); }
+.btn-g { border-color: var(--line); color: var(--ink); background: transparent; }
+.btn-g:hover { border-color: var(--muted); }
+
+/* --- Eyebrow / kicker --- */
+.eyebrow {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

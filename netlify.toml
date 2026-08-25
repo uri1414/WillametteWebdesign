@@ -1,0 +1,97 @@
+# ---------------------------------------------------------------------------
+# Willamette Web Design — Netlify configuration
+# Static site, no build step. The homepage is a real file at /index.html and is
+# served directly at "/". There is deliberately NO root redirect or rewrite:
+# the predecessor site (Baseline Studio) needed a forced 200-rewrite to paper
+# over a meta-refresh stub, which was a standing outage risk. Clean structure
+# here means the root just works. Keep it that way.
+# ---------------------------------------------------------------------------
+
+[build]
+  publish = "."
+  command = ""
+
+# ---------------------------------------------------------------------------
+# Caching (handbook §2.7)
+# Fingerprinted/static assets are immutable for a year. HTML must stay fresh so
+# content and metadata edits go live on the next request.
+# ---------------------------------------------------------------------------
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Crawler-facing files: cache briefly, never immutably.
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/llms.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    Content-Type = "text/plain; charset=utf-8"
+
+# ---------------------------------------------------------------------------
+# Security headers (handbook §3.2 — also a Lighthouse Best-Practices signal)
+# ---------------------------------------------------------------------------
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=(), usb=(), interest-cohort=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+
+    # HSTS: only safe once the apex + www both serve valid HTTPS. Netlify
+    # provisions certs automatically, so this is fine from launch — but do NOT
+    # add `preload` until the domain has run clean for weeks. Preload is very
+    # hard to reverse.
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+    # CSP starts in REPORT-ONLY on purpose (handbook §9: "Shipping an enforcing
+    # CSP untested → it silently blocks fonts/analytics"). Watch the browser
+    # console on a real deploy, widen for anything legitimate, and only then
+    # rename this key to Content-Security-Policy to enforce.
+    #
+    # 'unsafe-inline' on style-src is required while CSS is inlined for
+    # render-blocking reasons (§2.4). script-src allows GA4 only.
+    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; upgrade-insecure-requests"
+
+# ---------------------------------------------------------------------------
+# Redirects
+# www → apex is handled by Netlify's domain settings (set the apex as primary
+# in the Netlify UI) so it stays a SINGLE hop. Do not duplicate it here — two
+# redirect layers produce a chain, which the handbook §3.2 calls out.
+# ---------------------------------------------------------------------------
+
+# 404s serve the branded page with a real 404 status (handbook §3.2).
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404

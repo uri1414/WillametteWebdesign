@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found | Willamette Web Design</title>
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<!--
+  Branded 404 (handbook §3.2). netlify.toml serves this with a real 404 status
+  — a "soft 404" that returns 200 gets the page indexed as thin content.
+
+  Styling is deliberately token-driven and self-contained: when the brand
+  lands, only the :root values below need to change.
+-->
+<style id="site-css">:root{--ink:#14181a;--body:#4a5560;--muted:#7b8794;--paper:#fbfaf8;--line:#e6e8ea;--brand:#14181a;--font-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--font-display:var(--font-body);--wrap:1120px;--radius:14px;--radius-pill:999px;--ease:cubic-bezier(.22,.61,.36,1)}*{box-sizing:border-box;margin:0;padding:0}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{font-family:var(--font-body);color:var(--body);background:var(--paper);line-height:1.6;-webkit-font-smoothing:antialiased}h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);line-height:1.12;letter-spacing:-.02em}a{color:inherit;text-decoration:none}img{max-width:100%;height:auto;display:block}.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:24px}.skip{position:absolute;left:-9999px}.skip:focus{left:16px;top:12px;z-index:99;background:var(--paper);color:var(--ink);padding:10px 16px;border-radius:8px;border:1px solid var(--line)}:focus-visible{outline:2px solid var(--ink);outline-offset:2px}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-display);font-weight:600;font-size:15px;padding:12px 22px;border-radius:var(--radius-pill);border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:transform .2s var(--ease),background .2s,border-color .2s,color .2s}.btn:hover{transform:translateY(-1px)}.btn-p{background:var(--brand);color:var(--paper)}.btn-g{border-color:var(--line);color:var(--ink);background:transparent}.btn-g:hover{border-color:var(--muted)}.eyebrow{font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}</style>
+<style id="page-css">
+/* Page-local styles. `npm run css` does not touch this block — only the
+   <style id="site-css"> block above it. Shared components live in site.css. */
+body { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+main { max-width: 34rem; text-align: center; }
+h1 { font-size: clamp(28px, 6vw, 40px); margin: 12px 0 0; }
+p { margin-top: 14px; font-size: 17px; }
+.actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+.contact {
+  margin-top: 32px; padding-top: 24px;
+  border-top: 1px solid var(--line); font-size: 15px;
+}
+.contact a {
+  color: var(--ink); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Error 404</p>
+  <h1>We couldn&rsquo;t find that page.</h1>
+  <p>The link may be out of date, or the address might have a typo in it. Everything else is still right where you left it.</p>
+
+  <!-- Links back into the site: a 404 should recover the visit, not end it. -->
+  <div class="actions">
+    <a class="btn btn-p" href="/">Back to home</a>
+    <a class="btn btn-g" href="/contact/">Get in touch</a>
+  </div>
+
+  <p class="contact">
+    Need something now? Call
+    <a href="tel:+15414979531">(541) 497-9531</a>
+    or email <a href="mailto:info@willametteweb.com">info@willametteweb.com</a>.
+  </p>
+</main>
+</body>
+</html>

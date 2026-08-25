@@ -1,0 +1,57 @@
+# robots.txt — Willamette Web Design
+# https://willametteweb.com
+#
+# Policy: open to search crawlers AND to AI answer engines. Being crawlable by
+# GPTBot/PerplexityBot/ClaudeBot is what makes the business citable inside
+# ChatGPT, Perplexity and Google AI Overviews (handbook §3.2 + §5).
+
+User-agent: *
+Allow: /
+
+# --- AI / generative search crawlers (explicitly welcomed) ---
+
+# OpenAI — training corpus
+User-agent: GPTBot
+Allow: /
+
+# OpenAI — live ChatGPT search retrieval
+User-agent: OAI-SearchBot
+Allow: /
+
+# OpenAI — on-demand fetch when a user pastes a link
+User-agent: ChatGPT-User
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google's AI surfaces (Gemini / AI Overviews grounding).
+# Note: this is separate from Googlebot — disallowing it removes the site from
+# AI Overviews without helping classic rankings.
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence / Siri
+User-agent: Applebot-Extended
+Allow: /
+
+# Common Crawl — feeds many downstream AI datasets and backlink tools
+User-agent: CCBot
+Allow: /
+
+# Microsoft Copilot
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://willametteweb.com/sitemap.xml
