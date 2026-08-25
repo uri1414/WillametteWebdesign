@@ -32,9 +32,10 @@ Every section moves toward one action, with a lower-commitment fallback:
 - **Primary conversion:** apply for the **Willamette 30-Day Program — $799**
   one-time (website + local SEO + Google Business Profile + listings + lead
   capture), followed by **$99/month** ongoing management.
-- **Soft conversion:** a **free website audit** that captures the ~90% who
-  aren't ready on visit one. The funnel documents call this the single
-  highest-leverage element on the page — treat its form as critical path.
+- **Soft conversion:** a **free presence check** (never "audit" — see below)
+  that captures the ~90% who aren't ready on visit one. The funnel documents
+  call this the single highest-leverage element on the page — treat its form
+  as critical path.
 - **Positioning wedge:** genuinely bilingual (EN/ES) service for an underserved
   market. Spanish is never an afterthought; `/es/` is a full peer of `/`.
 - **Risk reversal:** a 30-day money-back **satisfaction** guarantee. It is
@@ -61,6 +62,14 @@ Section-by-section source of truth: `docs/FUNNEL-BLUEPRINT.md`.
   "Content integrity" below.
 - **Anything requiring evidence**: reviews, ratings, years in business, client
   counts, credentials, testimonials.
+
+**Naming: "presence check", never "audit".** The approved blueprint names the
+soft-conversion offer "the free presence check" throughout; the design export
+instead wrote "audit" everywhere. `flatten-export.py`'s `rename_presence_check()`
+corrects this on every build — visible copy, the Netlify form name
+(`presence-check`), and every `data-presence-*` attribute. If a re-export
+reintroduces "audit" wording, that transform is where it gets fixed, not in a
+one-off edit to the generated HTML.
 
 > **The honesty rule overrides everything** (handbook §1, §9). No fabricated
 > reviews, no `aggregateRating` without real ratings, no invented street address,

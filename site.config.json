@@ -96,12 +96,12 @@
     "Ongoing support and management"
   ],
   "forms": {
-    "$comment": "The free audit form is the funnel's soft-conversion path. It is wired to Netlify Forms: Netlify detects the form in the deployed HTML and captures POSTs to '/', so there is no backend to run. It only works on a Netlify deploy — locally the POST fails and site.js shows the phone-number fallback, which is correct behaviour, not a bug.",
+    "$comment": "The free presence check form is the funnel's soft-conversion path. It is wired to Netlify Forms: Netlify detects the form in the deployed HTML and captures POSTs to '/', so there is no backend to run. It only works on a Netlify deploy — locally the POST fails and site.js shows the phone-number fallback, which is correct behaviour, not a bug.",
     "provider": "netlify-forms",
-    "formName": "audit",
+    "formName": "presence-check",
     "honeypotField": "company",
     "notificationsEnabled": false,
-    "_todo": "Netlify does NOT email you by default. After the first deploy open Netlify > Forms > audit > Settings > Form notifications and add an email notification to info@willametteweb.com, then submit a real test and confirm it arrives. Until that is done the submissions are captured but nobody is told, which looks exactly like a working form and loses every lead. Set this flag to true once a test email has actually landed.",
+    "_todo": "Netlify does NOT email you by default. After the first deploy open Netlify > Forms > presence-check > Settings > Form notifications and add an email notification to info@willametteweb.com, then submit a real test and confirm it arrives. Until that is done the submissions are captured but nobody is told, which looks exactly like a working form and loses every lead. Set this flag to true once a test email has actually landed.",
     "applyEndpoint": null
   }
 }

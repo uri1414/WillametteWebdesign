@@ -120,7 +120,7 @@
   }
 
   /* -----------------------------------------------------------------------
-     Free-audit form
+     Free presence-check form
 
      Submits to Netlify Forms: Netlify detects the form in the deployed HTML
      and captures POSTs to "/" rather than routing them. That means a real
@@ -131,9 +131,9 @@
      the form is a warm lead, so a failure hands them the phone number rather
      than a dead end.
      ----------------------------------------------------------------------- */
-  var form = document.querySelector('[data-audit-form]');
-  var success = document.querySelector('[data-audit-success]');
-  var status = document.querySelector('[data-audit-status]');
+  var form = document.querySelector('[data-presence-form]');
+  var success = document.querySelector('[data-presence-success]');
+  var status = document.querySelector('[data-presence-status]');
 
   if (form) {
     form.addEventListener('submit', function (e) {
@@ -174,7 +174,7 @@
           status.textContent = form.getAttribute('data-success-label') || 'Thank you.';
         }
       }).catch(function (err) {
-        console.error('[willamette] audit form submission failed:', err);
+        console.error('[willamette] presence check form submission failed:', err);
         if (button) {
           button.removeAttribute('aria-disabled');
           if (button.dataset.label) button.textContent = button.dataset.label;

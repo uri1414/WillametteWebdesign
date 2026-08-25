@@ -181,7 +181,7 @@ def resolve_inputs(soup):
         # and the submissions list becomes unusable. (Deriving the name from the
         # label also mangled accents: "Correo electronico" -> "correo-electr-nico".)
         slug = canonical_field_name(label_text, input_type)
-        field_id = f"audit-{slug}"
+        field_id = f"presence-{slug}"
 
         label = soup.new_tag("label")
         label["class"] = "field"
@@ -212,12 +212,13 @@ def resolve_inputs(soup):
 
 
 
-# The free audit form is the funnel's soft-conversion path. Netlify Forms gives
-# it a real backend with no server to run: Netlify detects the form in the
-# static HTML at deploy time, and posts to "/" are captured instead of routed.
+# The free presence check form is the funnel's soft-conversion path. Netlify
+# Forms gives it a real backend with no server to run: Netlify detects the form
+# in the static HTML at deploy time, and posts to "/" are captured instead of
+# routed.
 NAP_CACHE = {}
 
-AUDIT_FORM_COPY = {
+PRESENCE_FORM_COPY = {
     "en": {
         "sending": "Sending\u2026",
         "hp_label": "Leave this field empty",
@@ -231,11 +232,11 @@ AUDIT_FORM_COPY = {
 }
 
 
-def wire_audit_form(soup, form, lang):
-    copy = AUDIT_FORM_COPY[lang]
+def wire_presence_form(soup, form, lang):
+    copy = PRESENCE_FORM_COPY[lang]
 
-    form["data-audit-form"] = ""
-    form["name"] = "audit"
+    form["data-presence-form"] = ""
+    form["name"] = "presence-check"
     form["method"] = "post"
     form["action"] = "/"
     form["data-netlify"] = "true"
@@ -249,7 +250,7 @@ def wire_audit_form(soup, form, lang):
     # Netlify matches the submission to the form by this field.
     hidden = soup.new_tag("input", type="hidden")
     hidden["name"] = "form-name"
-    hidden["value"] = "audit"
+    hidden["value"] = "presence-check"
     form.insert(0, hidden)
 
     # Both languages post to the same form so submissions land in one list;
@@ -276,7 +277,7 @@ def wire_audit_form(soup, form, lang):
 
     # A live region so the outcome is announced, not just shown.
     status = soup.new_tag("p")
-    status["data-audit-status"] = ""
+    status["data-presence-status"] = ""
     status["role"] = "status"
     status["aria-live"] = "polite"
     status["hidden"] = ""
@@ -344,18 +345,18 @@ def resolve_conditionals(soup, lang, notes):
                     header.append(nav.extract())
             node.decompose()
 
-        # --- audit form states: both present, success hidden until submit ---
+        # --- presence check form states: both present, success hidden until submit ---
         elif cond == "notSent":
             form = node.find("form")
             if form is not None:
-                wire_audit_form(soup, form, lang)
+                wire_presence_form(soup, form, lang)
             unwrap(node)
         elif cond == "sent":
             box = node.find("div")
             if box is not None:
-                box["data-audit-success"] = ""
+                box["data-presence-success"] = ""
                 box["hidden"] = ""
-                box["class"] = (box.get("class") or []) + ["audit-success"]
+                box["class"] = (box.get("class") or []) + ["presence-success"]
             unwrap(node)
 
         # --- design-review placeholder notes: never ship these ---
@@ -841,6 +842,71 @@ META = {
 }
 
 
+
+# The approved blueprint (docs/FUNNEL-BLUEPRINT.md) names the soft-conversion
+# offer "the free presence check" throughout. The design export instead wrote
+# "audit" in every visible instance -- a drift from the approved copy, not an
+# internal inconsistency (it was consistent, just consistently wrong). Fixed
+# here rather than in the source export, so it survives a re-export.
+RENAME_PRESENCE_CHECK = {
+    "en": [
+        ("FREE WEBSITE AUDIT", "FREE PRESENCE CHECK"),
+        ("free audit", "free presence check"),
+    ],
+    "es": [
+        ("AUDITOR\u00cdA GRATUITA", "REVISI\u00d3N DE PRESENCIA GRATIS"),
+        ("AUDITOR\u00cdA GRATIS", "REVISI\u00d3N DE PRESENCIA GRATIS"),
+        ("auditor\u00eda gratuita", "revisi\u00f3n de presencia gratuita"),
+        ("auditor\u00eda gratis", "revisi\u00f3n de presencia gratis"),
+    ],
+}
+
+
+def rename_presence_check(soup, lang):
+    """Apply the presence-check renames to every visible text node.
+
+    Walks NavigableStrings rather than the raw HTML so a replacement can never
+    land inside an attribute or a <script>/<style> block.
+    """
+    from bs4 import NavigableString
+
+    pairs = RENAME_PRESENCE_CHECK[lang]
+    for node in soup.find_all(string=True):
+        if not isinstance(node, NavigableString):
+            continue
+        if node.find_parent(["script", "style"]) is not None:
+            continue
+        text = str(node)
+        replaced = text
+        for old, new in pairs:
+            replaced = replaced.replace(old, new)
+        if replaced != text:
+            node.replace_with(replaced)
+
+
+def fix_orphan_apply_button(soup):
+    """The Final CTA's Apply button has no destination -- fix it.
+
+    The design export gave this button no href, presumably meaning to trigger
+    a real application flow. That flow does not exist yet, so as built the
+    button is a <button type="submit"> with no enclosing <form>: a dead click
+    that looks identical to a working one. Until the real qualification flow
+    is built, route it to the only working conversion mechanism already on the
+    page -- the free presence check form.
+    """
+    apply_section = soup.find(id="apply")
+    if apply_section is None:
+        return
+    for btn in apply_section.find_all("button", attrs={"type": "submit"}):
+        if btn.find_parent("form") is not None:
+            continue  # a real submit button inside a real form; leave it
+        link = soup.new_tag("a", href="#check")
+        link["class"] = btn.get("class", [])
+        for child in list(btn.contents):
+            link.append(child.extract())
+        btn.replace_with(link)
+
+
 def build_head(lang, cfg, css, faqs=None):
     """The full <head>. Every tag here is required by scripts/audit.mjs."""
     m = META[lang]
@@ -1044,7 +1110,9 @@ def main():
         tag_header_parts(soup)
         tag_footer_year(soup)
         resolve_conditionals(soup, lang, notes)
+        rename_presence_check(soup, lang)
         resolve_buttons(soup)
+        fix_orphan_apply_button(soup)
         resolve_inputs(soup)
         resolve_events(soup, lang)
         resolve_hovers(soup, set())

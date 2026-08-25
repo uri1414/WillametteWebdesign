@@ -78,29 +78,34 @@ The audit fails the build on all of these, but check them consciously too:
 Source of truth: `docs/FUNNEL-BLUEPRINT.md`. These are the items that decide
 whether the page earns anything.
 
-- [x] **The free audit form has a backend.** Wired to Netlify Forms — no server
-      to run. Verified: it POSTs urlencoded to `/` with `form-name=audit`, the
-      visitor's language, canonical field names in both languages, and an armed
-      honeypot.
+- [x] **The free presence check form has a backend.** Wired to Netlify Forms —
+      no server to run. Verified: it POSTs urlencoded to `/` with
+      `form-name=presence-check`, the visitor's language, canonical field names
+      in both languages, and an armed honeypot.
 - [ ] **Turn on form notifications.** Netlify captures submissions but emails
-      nobody by default. Netlify → Forms → `audit` → Settings → Form
+      nobody by default. Netlify → Forms → `presence-check` → Settings → Form
       notifications → add `info@willametteweb.com`. **A captured-but-unnotified
       form looks identical to a working one and loses every lead.**
 - [ ] **Submit a real test from the live site and confirm the email arrives.**
       Do not skip this; it is the only thing that proves the chain works.
 - [ ] Confirm the honeypot is not catching real people (check Netlify's spam
       folder after the first week).
-- [ ] **Follow-up sequence exists behind the audit.** Most local leads convert on
-      the third or fourth touch. Without a sequence, the audit capture is a list
-      nobody emails.
-- [ ] **The audit is productized** (GBP check, mobile speed, listings gaps,
-      competitor comparison) so delivering one does not eat a day.
-- [ ] **The Apply flow exists.** Every primary CTA currently points at `#apply`.
-      Build the qualification flow, or point them at something real. A CTA that
-      scrolls to a section with no form is a dead end.
+- [ ] **Follow-up sequence exists behind the presence check.** Most local leads
+      convert on the third or fourth touch. Without a sequence, the capture is a
+      list nobody emails.
+- [ ] **The presence check is productized** (GBP check, mobile speed, listings
+      gaps, competitor comparison) so delivering one does not eat a day.
+- [x] **No more dead Apply click.** The Final CTA's Apply button had no `<form>`
+      to submit — a silent no-op. It now links to `#check`, the working
+      presence-check form, until the real flow below exists.
+- [ ] **The Apply flow exists.** Every primary CTA still points at `#apply` /
+      `#check`, not a real qualification flow. Build the 4-step application (or
+      a shortened version), or the interim routing above stays permanent by
+      default.
 - [ ] Application shows a progress indicator, and step 1 asks the minimum.
 - [ ] Conversion tracking fires on: CTA clicks, application start, application
-      complete, audit submit, phone clicks (blueprint, Technical guardrails).
+      complete, presence-check submit, phone clicks (blueprint, Technical
+      guardrails).
 - [ ] Every claim on the page is true today — no invented counts, no sample
       testimonials. See "Content integrity" in `CLAUDE.md`.
 - [ ] Guarantee copy never implies a promised number of leads or rankings.

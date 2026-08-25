@@ -393,7 +393,7 @@ details[open] summary{color:#D5683C !important}
 .drawer.is-open { transform: none; opacity: 1; pointer-events: auto; }
 
 /* --- Audit form success swap --- */
-.audit-success { animation: faqOpen .35s cubic-bezier(.22, .61, .36, 1); }
+.presence-success { animation: faqOpen .35s cubic-bezier(.22, .61, .36, 1); }
 
 /* ---------------------------------------------------------------------------
    REDUCED MOTION
