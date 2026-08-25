@@ -59,11 +59,20 @@ Section-by-section source of truth: `docs/FUNNEL-BLUEPRINT.md`.
   agreement, and it is `noindex` until they clear. See `docs/BUILD-NOTES.md`.
 - **Social profiles.** `sameAs` stays empty until each profile is live, claimed,
   and verified. An unverified URL there is a trust-signal violation.
-- **Proof.** There are no clients, reviews or metrics yet. The mockup's sample
-  testimonial and "Only 2 spots left" counter were removed for this reason — see
-  "Content integrity" below.
-- **Anything requiring evidence**: reviews, ratings, years in business, client
-  counts, credentials, testimonials.
+- **Proof.** Two real Willamette Valley businesses have been through the full
+  program (same scope as the $799 offer, under this brand) — live in about two
+  weeks. That fact is stated on the homepage (the "Already done once" card in
+  the guarantee section). What is still NOT there: a named, permissioned
+  testimonial from either business. Get their explicit sign-off and an actual
+  quote before naming them or attributing a quote — until then this stays a
+  general, honest statement with no name attached. The mockup's *fabricated*
+  sample testimonial and "Only 2 spots left" counter were removed for a
+  different reason (they named a person who does not exist / were stale
+  numbers) — see "Content integrity" below. Do not confuse the two: this proof
+  point is real, it just isn't a quote yet.
+- **Anything requiring evidence beyond the above**: reviews, ratings, years in
+  business, specific client counts beyond the two noted here, credentials,
+  testimonials with a name attached.
 
 **Naming: "presence check", never "audit".** The approved blueprint names the
 soft-conversion offer "the free presence check" throughout; the design export

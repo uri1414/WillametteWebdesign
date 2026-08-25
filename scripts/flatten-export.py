@@ -1134,6 +1134,90 @@ def add_presence_check_card(soup, lang):
     grid.append(card)
 
 
+TRACK_RECORD_CARD = {
+    "en": {
+        "heading": "Already done once — in about 2 weeks.",
+        "body": ("Two Willamette Valley businesses have been through this exact "
+                 "process: full website, Google Business Profile, and listings "
+                 "on Yelp, Nextdoor, Apple Business, Bing, and Facebook — all "
+                 "live and connected in about two weeks. What usually takes "
+                 "months of piecing tools together happened inside one "
+                 "program."),
+    },
+    "es": {
+        "heading": "Ya lo hicimos una vez — en unas 2 semanas.",
+        "body": ("Dos negocios del valle de Willamette pasaron por este mismo "
+                 "proceso completo: sitio web, Perfil de Negocio de Google, y "
+                 "directorios en Yelp, Nextdoor, Apple Business, Bing y "
+                 "Facebook — todo conectado y en línea en unas dos semanas. "
+                 "Lo que normalmente toma meses juntando herramientas por "
+                 "separado, pasó dentro de un solo programa."),
+    },
+}
+
+
+def add_track_record_card(soup, lang):
+    """Add a fourth card to the guarantee/trust grid: real, completed work.
+
+    Two businesses have actually been through the full program (same scope
+    as the $799 offer) under this brand -- see CLAUDE.md's "Proof" note. This
+    states only what is true today: no client is named (that needs their
+    permission and an actual quote first -- see CLAUDE.md), no rating or
+    review schema is added, no count is rounded up. Once a named,
+    permissioned quote exists, that becomes a real testimonial -- this card
+    does not need to wait for that to say something honest right now.
+    """
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("07 Guarantee")})
+    if section is None:
+        return
+    grid = section.find("div", style=lambda s: s and
+                         "grid-template-columns:repeat(auto-fit,minmax(280px,1fr))" in s)
+    if grid is None:
+        return
+    cards = grid.find_all("div", recursive=False)
+    if len(cards) != 3:
+        return  # already patched, or the export's structure changed
+
+    copy = TRACK_RECORD_CARD[lang]
+
+    # grid-column:1/-1 spans the full row on the auto-fit grid instead of
+    # sitting alone in a fourth column-track with empty space beside it (the
+    # other three cards fill the row evenly; a lone fourth card would not).
+    # A wide banner also suits "highlight this" better than a same-sized
+    # fourth card would.
+    card = soup.new_tag("div", **{"class": "lift"})
+    card["style"] = ("grid-column:1/-1;background:#F8F1E3;border:1px solid var(--border-rule);"
+                      "border-radius:10px;padding:32px;display:flex;gap:24px;"
+                      "flex-wrap:wrap;align-items:flex-start")
+
+    icon = soup.new_tag("svg", **{
+        "width": "30", "height": "30", "viewBox": "0 0 24 24", "fill": "none",
+        "stroke": "#233D32", "stroke-width": "1.75", "stroke-linecap": "round",
+        "stroke-linejoin": "round", "style": "flex-shrink:0",
+    })
+    circle = soup.new_tag("circle", cx="12", cy="12", r="10")
+    check = soup.new_tag("path", d="m9 12 2 2 4-4")
+    icon.append(circle)
+    icon.append(check)
+
+    text = soup.new_tag("div")
+    text["style"] = "flex:1;min-width:240px"
+
+    h3 = soup.new_tag("h3")
+    h3["style"] = "font:700 20px var(--font-display);color:var(--color-forest)"
+    h3.string = copy["heading"]
+
+    body = soup.new_tag("p")
+    body["style"] = "font:400 15px/1.6 var(--font-ui);color:var(--text-body);margin:10px 0 0;max-width:68ch"
+    body.string = copy["body"]
+
+    text.append(h3)
+    text.append(body)
+    card.append(icon)
+    card.append(text)
+    grid.append(card)
+
+
 def fix_orphan_apply_button(soup):
     """The Final CTA's Apply button has no destination -- fix it.
 
@@ -1422,6 +1506,7 @@ def main():
         link_service_area(soup, lang, cfg)
         add_service_area_nav(soup, lang, cfg)
         add_presence_check_card(soup, lang)
+        add_track_record_card(soup, lang)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)
