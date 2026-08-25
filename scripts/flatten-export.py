@@ -705,6 +705,98 @@ HONEST_SCARCITY = {
 }
 
 
+
+def promote_card_headings(soup):
+    """Turn heading-styled divs into real heading elements.
+
+    The design export used <div> + inline font-display/bold styling to LOOK
+    like a sub-heading -- for the eight deliverable cards, the four timeline
+    steps, the guarantee card, the process-proof card, and the two pricing
+    cards -- without a real heading tag. That flattens the document outline: a
+    screen-reader user navigating by heading, or a search engine reading
+    heading structure for topical relevance, sees only the page's eight <h2>s
+    and nothing below them (SEO-PLAYBOOK.md 3: "logical H2/H3 hierarchy").
+
+    Matched by style (font-family: var(--font-display) + bold weight, a short
+    direct text run) rather than a hardcoded string list, so this keeps
+    working after a copy edit or a re-export -- it does not need updating when
+    the wording changes, only if the visual pattern itself changes.
+
+    Must run AFTER fix_unverified_claims() and wire_contact_and_legal(), which
+    locate specific divs by tag name (card.find("div")) to rewrite their text;
+    promoting those divs to <h3> first would make that lookup fail silently.
+    """
+    for div in list(soup.find_all("div")):
+        style = div.get("style", "")
+        if not re.search(r"font:\s*\d+\s+\d+px[^;]*var\(--font-display\)", style):
+            continue
+        text = div.get_text(" ", strip=True)
+        if not text or len(text) > 80:
+            continue
+        # The presence-check success message is transient UI state, not
+        # crawled page content -- it gets its own aria-live treatment instead.
+        if div.find_parent(attrs={"data-presence-success": True}) is not None:
+            continue
+
+        div.name = "h3"
+
+        # The two pricing cards show a bare number ("$799"). Announced alone
+        # that is meaningless to a screen reader, so borrow the eyebrow label
+        # sitting directly above it ("ONE-TIME LAUNCH") for an accessible name.
+        if re.fullmatch(r"\$\d[\d,]*(\s*/\s*(mo|mes))?", text):
+            eyebrow = div.find_previous_sibling("div")
+            if eyebrow is not None:
+                label = eyebrow.get_text(" ", strip=True)
+                div["aria-label"] = f"{label} \u2014 {text}"
+
+
+GUARANTEE_HEADING = {
+    "en": "30-Day Money-Back Satisfaction Guarantee",
+    "es": "Garant\u00eda de Satisfacci\u00f3n de 30 D\u00edas con Devoluci\u00f3n de Dinero",
+}
+
+
+def add_missing_section_heading(soup, lang):
+    """The Guarantee section has no <h2> at all in the source design.
+
+    Every other section on the page follows eyebrow -> <h2> -> content. This
+    one goes straight from the previous section's content into a two-card
+    grid with no heading identifying what the section is about -- a real gap
+    in the H2/H3 hierarchy (SEO-PLAYBOOK.md 3), not a cosmetic one: a screen
+    reader user navigating by heading skips straight from "30 days" to
+    "30-Day Guarantee" with nothing marking the section boundary, and a
+    crawler reading heading structure for topical relevance gets the same gap.
+
+    Inserted visually-hidden rather than as new visible copy: the fix is
+    structural, and the approved design should not be second-guessed here just
+    because the heading was missed. The wording is the blueprint's own
+    approved headline for this section (FUNNEL-BLUEPRINT.md, section 07), not
+    invented copy.
+    """
+    section = soup.find(attrs={"data-screen-label": re.compile(r"Guarantee")})
+    if section is None:
+        return
+    h2 = soup.new_tag("h2")
+    h2["class"] = ["visually-hidden"]
+    h2.string = GUARANTEE_HEADING[lang]
+    section.insert(0, h2)
+
+
+def announce_presence_success(soup):
+    """The presence-check success message needs a live region too.
+
+    wire_presence_form() already made the sending/error status an
+    aria-live="polite" region. The success swap (site.js sets form.hidden and
+    reveals this block) goes through a different element and was missed --
+    without this a screen-reader user who submits the form hears nothing at
+    all when it succeeds.
+    """
+    success = soup.find(attrs={"data-presence-success": True})
+    if success is not None:
+        success["role"] = "status"
+        success["aria-live"] = "polite"
+
+
 def fix_unverified_claims(soup, lang, notes):
     """Replace the invented testimonial and the hardcoded scarcity numbers."""
     proof = HONEST_PROOF[lang]
@@ -919,6 +1011,90 @@ def build_head(lang, cfg, css, faqs=None):
     # Schema. Deliberately omitted: aggregateRating, Review, sameAs, and any
     # postal address -- none of those are verified yet, and inventing them
     # violates both the handbook and Google's guidelines.
+    #
+    # SEO-PLAYBOOK.md section 3 calls for the homepage LocalBusiness schema to
+    # carry areaServed, hours, and a service catalog. areaServed is below;
+    # hours stays out because site.config.json's hours are still null -- an
+    # invented openingHours is worse than none, same honesty rule as the
+    # address. The service catalog and pricing ARE real and approved (the
+    # funnel blueprint's $799/$99-mo figures), so those are included.
+    area_served = [
+        {"@type": "City", "name": c} for c in
+        ["Albany, Oregon", "Corvallis, Oregon", "Salem, Oregon", "Lebanon, Oregon"]
+    ] + [{"@type": "AdministrativeArea", "name": "Willamette Valley, Oregon"}]
+
+    pricing = cfg.get("pricing") or {}
+    program, ongoing = pricing.get("program"), pricing.get("ongoing")
+    offers = []
+    if program:
+        offers.append({
+            "@type": "Offer",
+            "name": program["name"],
+            "price": str(program["price"]),
+            "priceCurrency": program["currency"],
+            "availability": "https://schema.org/InStock",
+            "url": f"{origin}/#apply",
+        })
+    if ongoing:
+        offers.append({
+            "@type": "Offer",
+            "name": ongoing["name"],
+            "price": str(ongoing["price"]),
+            "priceCurrency": ongoing["currency"],
+            "priceSpecification": {
+                "@type": "UnitPriceSpecification",
+                "price": str(ongoing["price"]),
+                "priceCurrency": ongoing["currency"],
+                "unitCode": "MON",
+            },
+        })
+
+    catalog = None
+    if cfg.get("services"):
+        catalog = {
+            "@type": "OfferCatalog",
+            "name": program["name"] if program else "Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {"@type": "Service", "name": svc},
+                }
+                for svc in cfg["services"]
+            ],
+        }
+
+    organization = {
+        # LocalBusiness listed explicitly even though ProfessionalService
+        # already implies it in the schema.org type hierarchy -- some
+        # consumers match the literal string rather than walking the
+        # hierarchy, and the playbook asks for it by name.
+        "@type": ["Organization", "LocalBusiness", "ProfessionalService"],
+        "@id": f"{origin}/#organization",
+        "name": cfg["brand"]["name"],
+        "url": f"{origin}/",
+        "email": nap["email"],
+        "telephone": nap["phoneE164"],
+        "image": og_image,
+        "logo": {
+            "@type": "ImageObject",
+            "url": f"{origin}/assets/img/logo-badge-138.png",
+            "width": 138,
+            "height": 138,
+        },
+        "description": m["og_desc"],
+        "knowsLanguage": ["en", "es"],
+        "areaServed": area_served,
+        "address": {
+            "@type": "PostalAddress",
+            "addressRegion": "OR",
+            "addressCountry": "US",
+        },
+    }
+    if offers:
+        organization["makesOffer"] = offers
+    if catalog:
+        organization["hasOfferCatalog"] = catalog
+
     schema = {
         "@context": "https://schema.org",
         "@graph": [
@@ -930,32 +1106,7 @@ def build_head(lang, cfg, css, faqs=None):
                 "inLanguage": "en-US" if lang == "en" else "es-US",
                 "publisher": {"@id": f"{origin}/#organization"},
             },
-            {
-                "@type": ["Organization", "ProfessionalService"],
-                "@id": f"{origin}/#organization",
-                "name": cfg["brand"]["name"],
-                "url": f"{origin}/",
-                "email": nap["email"],
-                "telephone": nap["phoneE164"],
-                "image": og_image,
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": f"{origin}/assets/img/logo-badge-138.png",
-                    "width": 138,
-                    "height": 138,
-                },
-                "description": m["og_desc"],
-                "knowsLanguage": ["en", "es"],
-                "areaServed": [
-                    {"@type": "City", "name": c} for c in
-                    ["Albany, Oregon", "Corvallis, Oregon", "Salem, Oregon", "Lebanon, Oregon"]
-                ] + [{"@type": "AdministrativeArea", "name": "Willamette Valley, Oregon"}],
-                "address": {
-                    "@type": "PostalAddress",
-                    "addressRegion": "OR",
-                    "addressCountry": "US",
-                },
-            },
+            organization,
             {
                 "@type": "Service",
                 "@id": f"{canonical}#service",
@@ -963,7 +1114,7 @@ def build_head(lang, cfg, css, faqs=None):
                          if lang == "en" else
                          "Dise\u00f1o web y configuraci\u00f3n de presencia local"),
                 "provider": {"@id": f"{origin}/#organization"},
-                "areaServed": {"@type": "AdministrativeArea", "name": "Willamette Valley, Oregon"},
+                "areaServed": area_served,
                 "availableLanguage": ["en", "es"],
             },
         ],
@@ -1118,6 +1269,9 @@ def main():
         resolve_hovers(soup, set())
         fix_unverified_claims(soup, lang, notes)
         wire_contact_and_legal(soup, lang, cfg)
+        promote_card_headings(soup)
+        add_missing_section_heading(soup, lang)
+        announce_presence_success(soup)
         dedupe_hero(soup)
         swap_images(soup, lang)
         add_motion(soup)
