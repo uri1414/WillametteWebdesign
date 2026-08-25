@@ -53,3 +53,73 @@ def minify_css(css):
     css = re.sub(r"\s*([{}:;,>~])\s*", r"\1", css)
     css = css.replace(";}", "}")
     return css.strip()
+
+
+# Where the real 30-Day Program application lives, per language. The homepage's
+# "Apply" buttons, the city pages and the design export all have to agree on
+# this, so it is defined once here.
+APPLY_PATH = {"en": "/apply/", "es": "/es/apply/"}
+
+
+def wire_apply_cta_html(html, lang):
+    """The same rewrite as wire_apply_cta(), but on already-built HTML.
+
+    Deliberately string-level. Re-parsing a finished page with BeautifulSoup and
+    writing it back re-serialises every tag in it -- attributes get reordered,
+    void elements get self-closing slashes -- and the other build scripts read
+    that output with regexes. Doing exactly that turned
+
+        <link rel="canonical" href="...">   into   <link href="..." rel="canonical"/>
+
+    on the homepage, which build-sitemap.mjs then could not recognise, and the
+    homepage silently dropped out of sitemap.xml. Touch only the hrefs.
+
+    Returns the rewritten HTML. Idempotent.
+    """
+    target = APPLY_PATH[lang]
+    out = re.sub(r'href="(?:/es)?/?#apply"', f'href="{target}"', html)
+    # The Final CTA's Apply button, routed into the presence-check form while
+    # there was no application to send it to.
+    out = re.sub(
+        r'(<a\b[^>]*href=")(?:/|/es/)?#check("[^>]*>\s*(?:Apply|Aplica)[^<]*)',
+        rf'\1{target}\2',
+        out,
+    )
+    return out
+
+
+def wire_apply_cta(soup, lang):
+    """Point every "Apply" call to action at the real application page.
+
+    Before the application existed, these buttons had nowhere to go: the design
+    export shipped the Final CTA's Apply button with no href at all, and the
+    build routed it to the free presence check as a stopgap so it was not a dead
+    click. The application flow is real now (/apply/), so every Apply CTA --
+    header, drawer, hero, final section -- points at it.
+
+    Idempotent: safe to run against a page that has already been wired.
+    """
+    target = APPLY_PATH[lang]
+    anchors = {"#apply", "/#apply", "/es/#apply", "#top#apply"}
+
+    for a in soup.find_all("a", href=True):
+        if a["href"] in anchors:
+            a["href"] = target
+
+    section = soup.find(id="apply")
+    if section is None:
+        return
+
+    # The stopgap link into the presence-check form, and the export's orphan
+    # <button> that never had a destination.
+    for a in section.find_all("a", href=True):
+        if a["href"].endswith("#check"):
+            a["href"] = target
+    for btn in section.find_all("button", attrs={"type": "submit"}):
+        if btn.find_parent("form") is not None:
+            continue  # a real submit button inside a real form; leave it
+        link = soup.new_tag("a", href=target)
+        link["class"] = btn.get("class", [])
+        for child in list(btn.contents):
+            link.append(child.extract())
+        btn.replace_with(link)

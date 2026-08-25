@@ -25,13 +25,13 @@ from html import escape
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from build_lib import extract_faqs, minify_css  # noqa: E402
+from build_lib import APPLY_PATH, extract_faqs, minify_css  # noqa: E402
 from city_content import CITIES  # noqa: E402
 
 # Anchors that exist only on the homepage. Bare on that page; from anywhere
 # else they must point back at it explicitly or the browser just fails to
 # scroll (the id isn't on the current page).
-HOMEPAGE_ANCHORS = {"how", "included", "about", "apply", "check"}
+HOMEPAGE_ANCHORS = {"how", "included", "about", "check"}
 
 LABELS = {
     "en": {
@@ -97,7 +97,10 @@ def rewrite_chrome_links(node, lang, current_url):
 
     for a in node.find_all("a", href=True):
         href = a["href"]
-        if href == "#top":
+        if href in ("#apply", "/#apply", "/es/#apply", APPLY_PATH["en"], APPLY_PATH["es"]):
+            # "Apply" is a real page now, not an anchor on the homepage.
+            a["href"] = APPLY_PATH[lang]
+        elif href == "#top":
             a["href"] = home
         elif href.startswith("#") and href[1:] in HOMEPAGE_ANCHORS:
             a["href"] = f"{home}{href}"
@@ -165,7 +168,7 @@ def build_body(soup, lang, city, cfg):
 
     cta_row = soup.new_tag("div", **{"data-stagger": ""})
     cta_row["style"] = "display:flex;gap:14px;flex-wrap:wrap;margin-top:28px"
-    apply_a = soup.new_tag("a", href=f"{'/' if lang=='en' else '/es/'}#apply")
+    apply_a = soup.new_tag("a", href=APPLY_PATH[lang])
     apply_a["class"] = ["btn", "btn--primary", "btn--lg", "lift"]
     apply_a.append(lab["apply_cta"] + " ")
     arw1 = soup.new_tag("span", **{"class": "arw", "aria-hidden": "true"})
@@ -303,7 +306,7 @@ def build_body(soup, lang, city, cfg):
     final_h2.string = lab["final_heading"]
     final_btn_wrap = soup.new_tag("div")
     final_btn_wrap["style"] = "margin-top:28px"
-    final_a = soup.new_tag("a", href=f"{'/' if lang=='en' else '/es/'}#apply")
+    final_a = soup.new_tag("a", href=APPLY_PATH[lang])
     final_a["class"] = ["btn", "btn--primary", "btn--lg"]
     final_a.append(lab["final_cta"] + " ")
     arw2 = soup.new_tag("span", **{"class": "arw", "aria-hidden": "true"})

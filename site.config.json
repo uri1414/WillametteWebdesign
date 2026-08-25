@@ -101,6 +101,20 @@
     "honeypotField": "company",
     "notificationsEnabled": false,
     "_todo": "Netlify does NOT email you by default. After the first deploy open Netlify > Forms > presence-check > Settings > Form notifications and add an email notification to info@willametteweb.com, then submit a real test and confirm it arrives. Until that is done the submissions are captured but nobody is told, which looks exactly like a working form and loses every lead. Set this flag to true once a test email has actually landed.",
-    "applyEndpoint": null
+    "applyEndpoint": "/.netlify/functions/application-start",
+    "application": {
+      "$comment": "The 30-Day Program application at /apply/ and /es/apply/. Unlike the presence check, this does NOT post to Netlify Forms: it writes to Supabase through a Netlify Function holding the service-role key, which is how the rest of the platform already talks to that database. Netlify Forms is kept as a parallel backup so there is still an email alert and a dashboard copy -- see docs/APPLICATION-SETUP.md.",
+      "startEndpoint": "/.netlify/functions/application-start",
+      "completeEndpoint": "/.netlify/functions/application-complete",
+      "table": "applications",
+      "backupFormName": "application",
+      "honeypotField": "company",
+      "statuses": ["partial", "complete", "contacted", "call_booked", "won", "lost"]
+    }
+  },
+  "booking": {
+    "$comment": "Scheduling link for the discovery call, shown on the application confirmation page. Null means no booking CTA is rendered -- the page then says only that we reply within one business day, which is the honest version until a real calendar exists. Set url, then re-run scripts/build-apply.py. Recommendations are in docs/APPLICATION-SETUP.md.",
+    "provider": null,
+    "url": null
   }
 }

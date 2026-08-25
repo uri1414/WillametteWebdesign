@@ -12,6 +12,23 @@
   command = ""
 
 # ---------------------------------------------------------------------------
+# Serverless functions (the 30-Day Program application backend)
+#
+# These hold the Supabase SERVICE ROLE key, which bypasses Row Level Security.
+# It lives in a Netlify environment variable and never reaches the browser --
+# the same model the referral backend already uses. See
+# docs/APPLICATION-SETUP.md and supabase/applications.sql.
+#
+# The functions deliberately have no npm dependencies (they call Supabase's
+# REST API with the runtime's own fetch), so nothing has to install or bundle
+# for a deploy to produce working endpoints.
+# ---------------------------------------------------------------------------
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# ---------------------------------------------------------------------------
 # Caching (handbook §2.7)
 # Fingerprinted/static assets are immutable for a year. HTML must stay fresh so
 # content and metadata edits go live on the next request.

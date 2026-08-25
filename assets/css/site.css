@@ -598,3 +598,220 @@ details[open] summary{color:#D5683C !important}
   }
   .hero-media > div { display: block; }
 }
+
+/* ---------------------------------------------------------------------------
+   APPLICATION FORM  (/apply/, /es/apply/)
+
+   The 30-Day Program application. It is meant to read as applying to something
+   selective, not as filling in a contact form -- hence the numbered steps, the
+   generous spacing, and the fact that only one step is on screen at a time.
+
+   Progressive enhancement, and the order matters: with JavaScript off, every
+   step is visible in one long form that posts to the Netlify function in a
+   single go. The step-by-step behaviour is layered on top by `html.js`, so a
+   failed script can never leave an applicant looking at a form they cannot
+   submit.
+   --------------------------------------------------------------------------- */
+
+.apply-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .apply-shell { grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr); gap: 56px; }
+}
+
+.apply-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--color-sage);
+  border-radius: var(--radius-lg);
+  padding: clamp(22px, 3.4vw, 38px);
+}
+
+/* --- Progress -------------------------------------------------------------
+   A count ("Step 2 of 4") plus a bar. Both are hidden without JS, where the
+   whole form is on one page and a step counter would be a lie. */
+.apply-progress { display: none; margin-bottom: 26px; }
+.js .apply-progress { display: block; }
+
+.apply-progress__label {
+  font: 700 12px var(--font-ui);
+  letter-spacing: .09em;
+  color: var(--color-rust);
+  text-transform: uppercase;
+}
+.apply-progress__track {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.apply-progress__seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-forest-faint);
+  transition: background var(--motion-fast, 160ms) ease;
+}
+.apply-progress__seg.is-done { background: var(--color-rust); }
+
+.apply-step { border: 0; padding: 0; margin: 0; }
+.apply-step + .apply-step { margin-top: 40px; }
+.js .apply-step + .apply-step { margin-top: 0; }
+.js .apply-step[hidden] { display: none; }
+
+/* Steps 2-4 before the script has taken over. Without `html.js` this rule does
+   not apply at all, which is what keeps the whole form usable with JS off. */
+.js .apply-step.is-later { display: none; }
+
+.apply-step__legend {
+  padding: 0;
+  font: 700 clamp(21px, 2.4vw, 26px)/1.25 var(--font-display);
+  color: var(--color-forest);
+}
+.apply-step__note {
+  font: 400 14.5px/1.6 var(--font-ui);
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.apply-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  margin-top: 22px;
+}
+@media (min-width: 620px) {
+  .apply-fields--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .apply-fields > .apply-span { grid-column: 1 / -1; }
+}
+
+/* --- Choice groups (radio / checkbox) -------------------------------------
+   Real inputs, styled -- not divs pretending to be inputs. Keyboard, screen
+   readers and form serialisation all keep working for free. */
+.apply-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.apply-choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: 500 14.5px var(--font-ui);
+  color: var(--text-body);
+  background: var(--color-cream);
+  border: 1px solid var(--border-rule);
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+.apply-choice input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--color-rust);
+  margin: 0;
+}
+.apply-choice:hover { border-color: var(--color-sage); }
+.apply-choice:has(input:checked) {
+  border-color: var(--color-rust);
+  background: var(--color-cream-raised);
+  box-shadow: inset 0 0 0 1px var(--color-rust);
+}
+.apply-choice:focus-within { box-shadow: 0 0 0 2px rgba(213, 104, 60, .3); }
+
+.apply-legend {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-forest);
+}
+
+/* --- Navigation ----------------------------------------------------------- */
+.apply-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-rule);
+}
+.apply-nav__spacer { flex: 1 1 auto; }
+
+/* The step buttons only mean anything once the script has taken over. */
+.apply-nav [data-apply-next],
+.apply-nav [data-apply-back] { display: none; }
+.js .apply-nav [data-apply-next],
+.js .apply-nav [data-apply-back] { display: inline-flex; }
+
+/* With JS on, the real submit button belongs to the last step only. */
+.js .apply-submit { display: none; }
+.js .apply-step:last-of-type .apply-submit { display: inline-flex; }
+
+.apply-status {
+  font: 600 14px/1.5 var(--font-ui);
+  color: var(--color-rust);
+  margin: 14px 0 0;
+}
+.field__input[aria-invalid="true"] { border-color: var(--color-rust); }
+
+/* --- Reassurance rail ----------------------------------------------------- */
+.apply-aside {
+  font-family: var(--font-ui);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  position: static;
+}
+@media (min-width: 900px) {
+  .apply-aside { position: sticky; top: 96px; }
+}
+.apply-aside__box {
+  background: var(--color-cream-deep);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+.apply-aside h2 {
+  font: 700 15px var(--font-display);
+  color: var(--color-forest);
+  margin: 0 0 12px;
+}
+.apply-aside ol, .apply-aside ul { margin: 0; padding-left: 18px; }
+.apply-aside li { font-size: 14.5px; line-height: 1.6; color: var(--text-body); }
+.apply-aside li + li { margin-top: 10px; }
+
+/* --- Confirmation page ---------------------------------------------------- */
+.apply-confirm { max-width: 640px; margin: 0 auto; text-align: center; }
+.apply-confirm__mark {
+  width: 62px; height: 62px;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  background: var(--color-forest);
+  color: var(--color-cream);
+  display: grid; place-items: center;
+  font: 700 30px/1 var(--font-display);
+}
+.apply-next {
+  text-align: left;
+  margin: 34px auto 0;
+  max-width: 520px;
+  display: grid;
+  gap: 14px;
+}
+.apply-next li {
+  display: flex;
+  gap: 12px;
+  font: 400 15.5px/1.6 var(--font-ui);
+  color: var(--text-body);
+  list-style: none;
+}
+.apply-next b { font-family: var(--font-display); color: var(--color-forest); }

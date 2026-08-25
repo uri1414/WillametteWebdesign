@@ -31,7 +31,11 @@ Every section moves toward one action, with a lower-commitment fallback:
 
 - **Primary conversion:** apply for the **Willamette 30-Day Program — $799**
   one-time (website + local SEO + Google Business Profile + listings + lead
-  capture), followed by **$99/month** ongoing management.
+  capture), followed by **$99/month** ongoing management. Every "Apply" button
+  goes to **`/apply/`** (`/es/apply/`), a 4-step application that writes into
+  Supabase through a Netlify Function. **Step 1 stores the lead on its own** —
+  see "The application" below; that behaviour is the point of the flow, not an
+  implementation detail.
 - **Soft conversion:** a **free presence check** (never "audit" — see below)
   that captures the ~90% who aren't ready on visit one. The funnel documents
   call this the single highest-leverage element on the page — treat its form
@@ -102,6 +106,41 @@ everything, so both were replaced during the build. **Do not restore them.**
 `npm run audit` fails the build on the *schema* forms of these
 (`aggregateRating`, `Review`, placeholder `sameAs`). It cannot detect invented
 prose — that part is on whoever writes the copy.
+
+## The application (`/apply/`)
+
+Full detail in `docs/APPLICATION-SETUP.md`. The parts that must not be
+"simplified" away by a later change:
+
+- **Step 1 inserts, steps 2-4 update.** Name + business + phone-or-email is
+  posted the moment it is filled in, creating one row with `status = 'partial'`.
+  The rest of the form updates that same row to `'complete'`. Someone who
+  abandons after step 1 is a reachable lead, not a lost one and not a duplicate
+  record. A "tidier" single submit at the end throws those people away silently.
+- **One database.** The `applications` table lives in the *same* Supabase
+  project as the referral program (`supabase/applications.sql` is additive).
+  Applicant → client is a status change on one row:
+  `partial → complete → contacted → call_booked → won → lost`.
+- **Server-side writes only.** RLS is on with no policies anywhere in that
+  project; the Netlify Functions hold the service-role key. Do not add an
+  anon-writable policy to move the write into the browser — that would open the
+  first public write in the database, on the table holding the leads.
+- **No JavaScript required.** With JS off the form is one page that posts to
+  `application-start` and redirects to the confirmation page. Steps 2-4 are
+  hidden by a *class* under `html.js`, never by the `hidden` attribute in the
+  markup — `hidden` in the HTML would make them unreachable without JS, and the
+  submit button lives in step 4.
+- **Netlify Forms is the backup, not the destination.** Every submission is
+  mirrored into the `application` form for the email alert and a dashboard copy,
+  and it is what catches a lead if Supabase is down. The hidden detection form
+  on `/apply/` is generated from `STEPS` — Netlify drops any field it did not
+  find in the deployed HTML.
+- **Field `name`s are database columns.** Identical in EN and ES. Translate the
+  label, never the name.
+
+The client **portal** (logins, uploads, progress tracker) does not exist as
+running software in any of these repos — `/platform/` on the old Baseline site
+is a static demo of it. The applications table is where that record starts.
 
 ## Working practices
 
@@ -208,6 +247,7 @@ _templates/page.html  Start every new page from this
 assets/
   css/site.css        Source stylesheet (inlined into pages by npm run css)
   js/site.js          First-party JS — always loaded with defer
+  js/apply.js         The application's step behaviour — /apply/ only
   fonts/              Self-hosted woff2
   img/                Shipped derivatives
   img/_src/           Full-res masters (gitignored, never deployed)
@@ -216,6 +256,13 @@ es/index.html         Homepage (ES) — GENERATED
 privacy/, terms/      Legal pages, EN + ES — GENERATED
 web-design-<city>-or/ City landing pages, EN + ES — GENERATED
   (albany, corvallis, salem, lebanon — the approved service area)
+apply/, es/apply/     30-Day Program application + confirmation — GENERATED
+netlify/functions/    application-start.js  -> insert the 'partial' row
+                      application-complete.js -> update it to 'complete'
+                      lib/db.js — Supabase REST + input hygiene, zero deps
+supabase/
+  applications.sql    The applications table. Run it in the SAME Supabase
+                      project as the referral program.
 scripts/
   audit.mjs           The handbook, executable. Gates the deploy.
   flatten-export.py   Design-tool export -> static EN + ES homepage
@@ -224,6 +271,11 @@ scripts/
   build-city-pages.py City pages from city_content.py — reuses the built
                       homepage's header/footer verbatim, so run this AFTER
                       flatten-export.py, not before
+  build-apply.py      /apply/ + /es/apply/ + both confirmation pages, and
+                      wires the homepage's Apply buttons to them — also
+                      needs the built homepage, so run it after
+                      flatten-export.py
+  apply_content.py    Application copy + field definitions, EN + ES
   city_content.py     Per-city intro + FAQ copy, EN + ES — genuinely unique
                       per city, not a template; see SEO-PLAYBOOK.md §2
   build_lib.py        extract_faqs() + minify_css(), shared by the three
@@ -239,6 +291,7 @@ docs/
   BUILD-NOTES.md      GENERATED — open items stripped from the mockup
   SEO-HANDBOOK.md     The full reference — performance, SEO, local, GEO
   SEO-PLAYBOOK.md     Service-page and city-page process
+  APPLICATION-SETUP.md How /apply/ works, Supabase + Netlify setup, testing
   LAUNCH-CHECKLIST.md Pre-launch and post-launch gates
 ```
 
@@ -252,6 +305,7 @@ build silently discards your change. Edit the source instead:
 | How the export is transformed | `scripts/flatten-export.py` |
 | Styling, motion, components | `assets/css/site.css` |
 | Legal copy (EN + ES) | `scripts/legal_content.py` |
+| Application copy or fields (EN + ES) | `scripts/apply_content.py` |
 | NAP, pricing, service area | `site.config.json` |
 
 Rebuild:
@@ -260,6 +314,7 @@ Rebuild:
 python3 scripts/flatten-export.py <export.html>   # homepage EN + ES — run first
 python3 scripts/build-legal.py                    # privacy + terms, EN + ES
 python3 scripts/build-city-pages.py                # city pages — needs the homepage's header/footer, so after flatten-export.py
+python3 scripts/build-apply.py                    # application + confirmation, EN + ES — also after flatten-export.py
 npm run preflight
 ```
 

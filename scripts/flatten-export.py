@@ -37,7 +37,7 @@ import sys
 
 from bs4 import BeautifulSoup
 
-from build_lib import extract_faqs, minify_css
+from build_lib import extract_faqs, minify_css, wire_apply_cta
 
 # Asset id -> the path it becomes in the repo. Ids come from the export's
 # manifest; anything not listed here is reported so it can't be silently lost.
@@ -1031,29 +1031,6 @@ def add_service_area_nav(soup, lang, cfg):
             drawer_nav.append(build_dropdown())
 
 
-def fix_orphan_apply_button(soup):
-    """The Final CTA's Apply button has no destination -- fix it.
-
-    The design export gave this button no href, presumably meaning to trigger
-    a real application flow. That flow does not exist yet, so as built the
-    button is a <button type="submit"> with no enclosing <form>: a dead click
-    that looks identical to a working one. Until the real qualification flow
-    is built, route it to the only working conversion mechanism already on the
-    page -- the free presence check form.
-    """
-    apply_section = soup.find(id="apply")
-    if apply_section is None:
-        return
-    for btn in apply_section.find_all("button", attrs={"type": "submit"}):
-        if btn.find_parent("form") is not None:
-            continue  # a real submit button inside a real form; leave it
-        link = soup.new_tag("a", href="#check")
-        link["class"] = btn.get("class", [])
-        for child in list(btn.contents):
-            link.append(child.extract())
-        btn.replace_with(link)
-
-
 def build_head(lang, cfg, css, faqs=None):
     """The full <head>. Every tag here is required by scripts/audit.mjs."""
     m = META[lang]
@@ -1310,7 +1287,7 @@ def main():
         resolve_conditionals(soup, lang, notes)
         rename_presence_check(soup, lang)
         resolve_buttons(soup)
-        fix_orphan_apply_button(soup)
+        wire_apply_cta(soup, lang)
         resolve_inputs(soup)
         resolve_events(soup, lang)
         resolve_hovers(soup, set())
