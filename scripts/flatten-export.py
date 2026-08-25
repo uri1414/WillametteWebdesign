@@ -529,8 +529,19 @@ def swap_images(soup, lang):
                                  hero=False, lazy=not first)
         elif name == "valley-hero":
             # The LCP element. Preloaded in <head>, never lazy.
+            #
+            # Deliberately drops the export's inline `style` (desktop-only
+            # absolute positioning) rather than passing it through: an inline
+            # style always beats a class selector regardless of specificity,
+            # which permanently overrode the .hero-media img rules in
+            # site.css and broke the mobile layout those rules exist for
+            # (the image ballooned to 488px wide, absolutely pinned to the
+            # bottom-right corner of the whole hero section, on a 390px
+            # viewport -- overlapping the CTAs and trust line beneath it).
+            # .hero-media img in site.css already fully replicates the
+            # desktop positioning for >=861px, so nothing is lost.
             sizes = "(max-width: 860px) 100vw, 58vw"
-            markup = picture_for(name, sizes=sizes, alt=alt, style=style, hero=True, lazy=False)
+            markup = picture_for(name, sizes=sizes, alt=alt, hero=True, lazy=False)
         else:
             markup = picture_for(name, sizes="(max-width: 700px) 80vw, 320px", alt=alt, style=style)
 
