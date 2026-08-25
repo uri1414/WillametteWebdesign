@@ -217,6 +217,27 @@ details[open] summary{color:#D5683C !important}
 }
 .field__hint { display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 
+/* --- Breadcrumb ---
+   Used on the city landing pages. Kept visually quiet -- it's a wayfinding
+   aid, not a content element -- and mirrored exactly by BreadcrumbList schema
+   so the two never disagree. */
+.breadcrumb { padding: 14px clamp(20px, 5vw, 64px) 0; }
+.breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font: 600 12.5px var(--font-ui);
+  color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--color-rust); }
+.breadcrumb li[aria-hidden] { color: var(--border-rule); }
+.breadcrumb [aria-current="page"] { color: var(--color-forest); font-weight: 700; }
+
 /* --- Eyebrow / kicker ---
    The small letterspaced label above a heading. Used on the 404 and on the
    legal pages' back-link. */

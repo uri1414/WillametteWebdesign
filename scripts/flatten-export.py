@@ -37,6 +37,8 @@ import sys
 
 from bs4 import BeautifulSoup
 
+from build_lib import extract_faqs, minify_css
+
 # Asset id -> the path it becomes in the repo. Ids come from the export's
 # manifest; anything not listed here is reported so it can't be silently lost.
 IMAGE_MAP = {
@@ -541,43 +543,6 @@ def swap_images(soup, lang):
 
 
 
-def extract_faqs(soup):
-    """Read the FAQ Q&A straight out of the rendered DOM.
-
-    FAQPage schema must mirror the visible Q&A exactly -- Google suppresses the
-    rich result otherwise, and the audit fails the build on a mismatch. Reading
-    the questions and answers from the DOM we just built is the only way to
-    guarantee they cannot drift: there is no second copy to fall out of sync.
-    """
-    faqs = []
-    for det in soup.find_all("details"):
-        summary = det.find("summary")
-        if summary is None:
-            continue
-
-        # The summary carries the +/- indicator glyphs alongside the question.
-        # Copy it, drop anything aria-hidden, and take what a reader actually
-        # sees -- otherwise the schema would contain "... ? + -".
-        q_node = BeautifulSoup(str(summary), "html.parser")
-        for junk in q_node.find_all(attrs={"aria-hidden": "true"}):
-            junk.decompose()
-        for junk in q_node.find_all(class_=re.compile(r"fq-(plus|minus|chev)")):
-            junk.decompose()
-        question = " ".join(q_node.get_text(" ", strip=True).split())
-
-        answer_parts = []
-        for sib in summary.next_siblings:
-            if getattr(sib, "get_text", None):
-                answer_parts.append(sib.get_text(" ", strip=True))
-            elif isinstance(sib, str):
-                answer_parts.append(sib.strip())
-        answer = " ".join(" ".join(answer_parts).split())
-
-        if question and answer:
-            faqs.append({"q": question, "a": answer})
-    return faqs
-
-
 def tag_footer_year(soup):
     """Mark the copyright year so site.js can keep it current.
 
@@ -976,6 +941,49 @@ def rename_presence_check(soup, lang):
             node.replace_with(replaced)
 
 
+
+def link_service_area(soup, lang, cfg):
+    """Turn the footer's plain-text city list into real links to the city pages.
+
+    SEO-PLAYBOOK.md section 2 calls for city pages to be linked "from a
+    Service Area dropdown in the nav + the footer" -- without this, the new
+    /web-design-<city>-or/ pages have no path in from the site's only
+    well-linked page, and a crawler has to find them through the sitemap
+    alone. The main nav stays untouched on purpose: the funnel blueprint
+    deliberately kept it to three links so nothing competes with Apply, and a
+    footer link list serves the same discovery purpose without disturbing
+    that.
+
+    The slug here (city name, lowercased) must match slugify_path() in
+    build-city-pages.py -- true for the four approved cities today, but if a
+    city with a multi-word name is ever added, both places need updating
+    together.
+    """
+    cities = (cfg.get("serviceArea") or {}).get("cities") or []
+    if not cities:
+        return
+
+    needle = "Albany \u00b7 Corvallis \u00b7 Salem \u00b7 Lebanon"
+    target = soup.find(string=lambda t: t and needle in t)
+    if target is None:
+        return
+
+    tail = str(target).split("Lebanon", 1)[1]  # " + surrounding ..." / " + comunidades ..."
+    parent = target.parent
+    parent.clear()
+
+    prefix = "/" if lang == "en" else "/es/"
+    for i, city in enumerate(cities):
+        if i > 0:
+            parent.append(" \u00b7 ")
+        a = soup.new_tag("a", href=f"{prefix}web-design-{city.lower()}-or/")
+        a["class"] = ["h-opaque"]
+        a["style"] = "color:inherit"
+        a.string = city
+        parent.append(a)
+    parent.append(tail)
+
+
 def fix_orphan_apply_button(soup):
     """The Final CTA's Apply button has no destination -- fix it.
 
@@ -1220,14 +1228,6 @@ def build_head(lang, cfg, css, faqs=None):
 {analytics}
 <script type="application/ld+json">{json.dumps(schema, ensure_ascii=False, separators=(",", ":"))}</script>"""
 
-def minify_css(css):
-    css = re.sub(r"/\*(?!!)[\s\S]*?\*/", "", css)
-    css = re.sub(r"\s+", " ", css)
-    css = re.sub(r"\s*([{}:;,>~])\s*", r"\1", css)
-    css = css.replace(";}", "}")
-    return css.strip()
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("export")
@@ -1269,6 +1269,7 @@ def main():
         resolve_hovers(soup, set())
         fix_unverified_claims(soup, lang, notes)
         wire_contact_and_legal(soup, lang, cfg)
+        link_service_area(soup, lang, cfg)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)
