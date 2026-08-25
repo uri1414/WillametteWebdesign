@@ -27,7 +27,8 @@ const CONFIG = existsSync(join(ROOT, 'site.config.json'))
 const ORIGIN = CONFIG?.domain?.origin ?? '';
 
 const SEVERITY = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
-const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates']);
+// `design/` holds build inputs (the raw export markup, master art), not pages.
+const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates', 'design']);
 
 /* ---------------------------------------------------------------- helpers */
 
@@ -129,6 +130,20 @@ function auditFile(absPath) {
 
   const isErrorPage = /(^|\/)404\.html$/.test(rel);
 
+  /**
+   * Explicit, documented exemptions. A page may opt out of a specific rule with
+   *   <!-- audit-allow: noindex — reason the exemption is correct -->
+   * The reason is required: an undocumented suppression is how a real defect
+   * gets silenced. Only the rules listed in ALLOWABLE can be waived.
+   */
+  const ALLOWABLE = new Set(['noindex']);
+  const allowed = new Map();
+  for (const m of raw.matchAll(/<!--\s*audit-allow:\s*([a-z-]+)\s*[—:-]\s*([^>]*?)-->/gi)) {
+    const rule = m[1].toLowerCase();
+    const reason = m[2].trim();
+    if (ALLOWABLE.has(rule) && reason) allowed.set(rule, reason);
+  }
+
   /* ===================== Document basics ===================== */
 
   if (!/^\s*<!doctype html>/i.test(raw)) {
@@ -220,7 +235,11 @@ function auditFile(absPath) {
 
   const robotsMeta = metaContent(html, 'robots') || '';
   if (/noindex/i.test(robotsMeta) && !isErrorPage) {
-    add('CRITICAL', '§3.2', 'Page is set to noindex — it will not rank. Remove before launch.');
+    if (allowed.has('noindex')) {
+      add('LOW', '§3.2', `noindex is intentional here — ${allowed.get('noindex')} Remove the directive and the exemption together.`);
+    } else {
+      add('CRITICAL', '§3.2', 'Page is set to noindex — it will not rank. Remove before launch.');
+    }
   }
 
   /* ===================== Social / Open Graph ===================== */
@@ -267,7 +286,13 @@ function auditFile(absPath) {
         add('CRITICAL', '§2.3', `<img ${label}> is both fetchpriority=high and loading=lazy — these cancel out and wreck LCP.`);
       }
     }
-    if (/\.(jpe?g|png)$/i.test(src) && !/<picture\b/i.test(html)) {
+    // A 46px logo is not where the byte wins are. Only flag images big enough
+    // for the format to matter.
+    const declaredW = Number(attr(img, 'width')) || 0;
+    const declaredH = Number(attr(img, 'height')) || 0;
+    const isTiny = declaredW > 0 && declaredW <= 100 && declaredH <= 100;
+
+    if (!isTiny && /\.(jpe?g|png)$/i.test(src) && !/<picture\b/i.test(html)) {
       add('MEDIUM', '§2.3', `<img ${label}> is ${extname(src).slice(1).toUpperCase()} with no <picture> AVIF/WebP sources — usually the single biggest byte win.`);
     }
   });
@@ -278,7 +303,11 @@ function auditFile(absPath) {
       add('MEDIUM', '§2.3', `${imgs.length} images and none use loading="lazy" — everything below the fold downloads up front.`);
     }
   }
-  if (imgs.length > 0 && heroCandidates === 0 && !isErrorPage) {
+  // Only ask for a prioritised hero when the page actually has an image large
+  // enough to be the LCP element. On a text-led page the LCP is a heading, and
+  // preloading a 46px logo would be pointless.
+  const hasLargeImage = imgs.some((i) => Number(attr(i, 'width')) > 300);
+  if (hasLargeImage && heroCandidates === 0 && !isErrorPage) {
     add('MEDIUM', '§2.3', 'No image marked fetchpriority="high". If the LCP element is an image, mark it and preload it.');
   }
   if (heroCandidates > 1) {

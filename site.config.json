@@ -1,22 +1,18 @@
 {
   "$comment": "Single source of truth for the site's identity. Every generated file (sitemap, robots, llms.txt, schema, page <head> blocks) reads from here. NAP consistency is a top-3 local ranking factor — change a value HERE, never in a page.",
-
   "brand": {
     "name": "Willamette Web Design",
     "shortName": "Willamette Web Design",
     "legalName": null,
-    "tagline": null,
-    "description": null,
-    "_todo": "tagline/description/legalName land with the business plan."
+    "tagline": "Websites that grow local businesses.",
+    "description": "Web design and local marketing for Willamette Valley businesses. A complete local presence in 30 days, in English and Spanish."
   },
-
   "domain": {
     "origin": "https://willametteweb.com",
     "canonicalHost": "willametteweb.com",
     "wwwRedirectsToApex": true,
     "trailingSlash": true
   },
-
   "nap": {
     "$comment": "Confirmed by the owner. Must appear byte-identical on the site, Google Business Profile, and every directory. 'phoneDisplay' is what humans read; 'phoneE164' is what tel: links and schema use.",
     "name": "Willamette Web Design",
@@ -29,28 +25,30 @@
     "addressRegion": "OR",
     "postalCode": null,
     "addressCountry": "US",
-    "_todo": "Locality is deliberately null. The (541) area code covers Eugene/Corvallis/Albany/Bend — NOT Salem (503/971). Confirm the real base city before any LocalBusiness schema, geo meta, or city page ships. Do not guess: an invented locality is a NAP mismatch against Google Business Profile."
+    "_todo": "addressLocality is still null on purpose. The homepage FAQ asks 'Do you work with businesses outside Albany?' and the (541) area code fits Albany, so Albany OR is the likely base -- but it is an inference, not a confirmed fact, and a wrong locality is a NAP mismatch against Google Business Profile. Confirm it, then set it here. Until then the site claims only 'Based in Oregon' and the schema uses areaServed + addressRegion, which is correct for a service-area business."
   },
-
   "geo": {
     "latitude": null,
     "longitude": null,
     "_todo": "Set once the base city is confirmed. Used for geo.position + ICBM meta and schema.geo."
   },
-
   "serviceArea": {
     "$comment": "Service-area business (no public storefront) until a street address is confirmed. Schema uses areaServed, not PostalAddress.",
     "type": "service-area-business",
     "region": "Willamette Valley, Oregon",
-    "cities": [],
-    "_todo": "City list drives /web-design-<city>-or/ pages. Each one must be >60% unique copy or Google treats them as doorway pages (SEO-PLAYBOOK.md §2)."
+    "cities": [
+      "Albany",
+      "Corvallis",
+      "Salem",
+      "Lebanon"
+    ],
+    "_todo": "These four are named in the approved funnel blueprint and in the site footer. Dedicated /web-design-<city>-or/ pages are a strong local-SEO play, but each must be >60% unique copy with real local specifics -- see docs/SEO-PLAYBOOK.md section 2. Swapping only the city name produces doorway pages and gets penalised."
   },
-
   "hours": null,
-
-  "languages": ["en"],
-  "_langTodo": "Baseline Studio shipped a full /es/ tree. Decide whether the new business model keeps bilingual; if yes, set to ['en','es'] and hreflang generation turns on.",
-
+  "languages": [
+    "en",
+    "es"
+  ],
   "sameAs": {
     "$comment": "ONLY verified profiles that are actually owned. An unverified or guessed URL here is a trust-signal violation (handbook §3.3 + §9). Empty is correct until each is live and claimed.",
     "googleBusinessProfile": null,
@@ -58,23 +56,48 @@
     "instagram": null,
     "linkedin": null
   },
-
   "analytics": {
     "ga4MeasurementId": null,
     "_todo": "New GA4 property for willametteweb.com. Load it deferred per handbook §2.6 — never a blocking gtag.js in <head>.",
     "searchConsoleVerified": false,
     "bingWebmasterVerified": false
   },
-
   "social": {
     "ogImage": "/assets/img/og-image.png",
     "ogImageWidth": 1200,
     "ogImageHeight": 630,
-    "ogImageAlt": null,
+    "ogImageAlt": "Willamette Web Design — websites that grow local businesses",
     "twitterCard": "summary_large_image"
   },
-
-  "pricing": null,
-  "services": [],
-  "_businessTodo": "Services + pricing come from the new business model. Nothing here is inferred from Baseline Studio — the model changed."
+  "pricing": {
+    "$comment": "From the approved funnel blueprint. Terms that touch billing start date, hard costs and the guarantee are still open -- see docs/BUILD-NOTES.md and the NEEDS_REVIEW callouts on /terms/.",
+    "program": {
+      "name": "The Willamette 30-Day Program",
+      "price": 799,
+      "currency": "USD",
+      "type": "one-time"
+    },
+    "ongoing": {
+      "name": "Ongoing Management",
+      "price": 99,
+      "currency": "USD",
+      "type": "monthly",
+      "optionalOrRequired": null
+    }
+  },
+  "services": [
+    "Custom website design and build",
+    "Local SEO foundation",
+    "Google Business Profile optimization",
+    "Local listings and citations",
+    "Social presence setup",
+    "Lead capture and forms",
+    "Analytics and conversion tracking",
+    "Ongoing support and management"
+  ],
+  "forms": {
+    "$comment": "The free audit form is the funnel's soft-conversion path and the highest-leverage lead source on the page. It posts nowhere until an endpoint is set here; site.js refuses to fake a success screen and logs an error instead, because a silent drop loses the lead.",
+    "auditEndpoint": null,
+    "applyEndpoint": null
+  }
 }

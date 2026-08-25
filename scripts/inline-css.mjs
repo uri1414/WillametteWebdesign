@@ -27,7 +27,7 @@ import { join, relative, extname } from 'node:path';
 const ROOT = process.cwd();
 const CSS_PATH = join(ROOT, 'assets/css/site.css');
 const CHECK = process.argv.includes('--check');
-const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates']);
+const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates', 'design']);
 
 if (!existsSync(CSS_PATH)) {
   console.log('assets/css/site.css does not exist yet — nothing to inline.');

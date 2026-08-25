@@ -24,17 +24,41 @@ truth. Change a value there, never inside a page. The audit script fails the
 build when a `tel:` link or schema `telephone` drifts from it — NAP consistency
 is a top-tier local ranking factor and formatting drift alone hurts.
 
+## The business model
+
+The homepage is a **direct-response sales funnel**, not an agency portfolio.
+Every section moves toward one action, with a lower-commitment fallback:
+
+- **Primary conversion:** apply for the **Willamette 30-Day Program — $799**
+  one-time (website + local SEO + Google Business Profile + listings + lead
+  capture), followed by **$99/month** ongoing management.
+- **Soft conversion:** a **free website audit** that captures the ~90% who
+  aren't ready on visit one. The funnel documents call this the single
+  highest-leverage element on the page — treat its form as critical path.
+- **Positioning wedge:** genuinely bilingual (EN/ES) service for an underserved
+  market. Spanish is never an afterthought; `/es/` is a full peer of `/`.
+- **Risk reversal:** a 30-day money-back **satisfaction** guarantee. It is
+  satisfaction-based and must never be presented as an outcome promise.
+
+Section-by-section source of truth: `docs/FUNNEL-BLUEPRINT.md`.
+
 ## Facts that are NOT settled — do not invent them
 
-- **Brand palette, typography, logo/wordmark.** The owner is designing these and
-  will send the homepage code. Do not choose colors or fonts on their behalf.
-- **Base city.** Deliberately `null` in `site.config.json`. The (541) area code
-  covers Eugene / Corvallis / Albany / Bend — **not Salem**, which is 503/971.
-  Guessing produces a NAP mismatch against Google Business Profile. Confirm
-  before writing any `LocalBusiness` schema, geo meta, or city page.
-- **Services, pricing, process.** Coming with the new business plan.
+- **Base city.** Deliberately `null` in `site.config.json`. The homepage FAQ asks
+  "Do you work with businesses outside Albany?" and the (541) area code fits
+  Albany, so **Albany, OR is the likely base — but it is an inference**. A wrong
+  locality is a NAP mismatch against Google Business Profile. Confirm it before
+  adding `LocalBusiness` address, geo meta, or city pages. Until then the site
+  says only "Based in Oregon" and the schema uses `areaServed` + `addressRegion`,
+  which is correct for a service-area business.
+- **Guarantee, billing and ownership terms.** The `/terms/` page carries visible
+  `NEEDS_REVIEW` callouts for every clause that depends on the signed client
+  agreement, and it is `noindex` until they clear. See `docs/BUILD-NOTES.md`.
 - **Social profiles.** `sameAs` stays empty until each profile is live, claimed,
   and verified. An unverified URL there is a trust-signal violation.
+- **Proof.** There are no clients, reviews or metrics yet. The mockup's sample
+  testimonial and "Only 2 spots left" counter were removed for this reason — see
+  "Content integrity" below.
 - **Anything requiring evidence**: reviews, ratings, years in business, client
   counts, credentials, testimonials.
 
@@ -44,6 +68,29 @@ is a top-tier local ranking factor and formatting drift alone hurts.
 > schema versions of these, but it can't catch invented prose — don't write it.
 
 ---
+
+## Content integrity — what was changed and why
+
+The approved design mockup carried two invented trust signals. The funnel
+blueprint flags both itself, and the handbook's honesty rule overrides
+everything, so both were replaced during the build. **Do not restore them.**
+
+1. **A fabricated testimonial** — a quote attributed to "Maria S., Cleaning
+   Services, Eugene", a person who does not exist. Replaced with a
+   process-proof card ("What you get, before you pay a cent") that does the same
+   persuasive work using only true statements. Swap in a real, permissioned
+   client quote once there is one — and only then.
+
+2. **Fabricated scarcity** — "Only 2 spots left this month", "SEPTEMBER
+   AVAILABILITY", "just 5 businesses at a time". Hardcoded numbers that were
+   already stale and unverifiable. Replaced with the blueprint's own approved
+   honest line: "We take on a limited number of new businesses each month."
+   A specific count has to be true on the day it is read; a hardcoded month
+   rots. If you want a real counter, drive it from live capacity.
+
+`npm run audit` fails the build on the *schema* forms of these
+(`aggregateRating`, `Review`, placeholder `sameAs`). It cannot detect invented
+prose — that part is on whoever writes the copy.
 
 ## Working practices
 
@@ -135,19 +182,45 @@ assets/
   fonts/              Self-hosted woff2
   img/                Shipped derivatives
   img/_src/           Full-res masters (gitignored, never deployed)
+index.html            Homepage (EN) — GENERATED
+es/index.html         Homepage (ES) — GENERATED
+privacy/, terms/      Legal pages, EN + ES — GENERATED
 scripts/
   audit.mjs           The handbook, executable. Gates the deploy.
+  flatten-export.py   Design-tool export -> static EN + ES pages
+  build-legal.py      Legal pages from legal_content.py
+  legal_content.py    Privacy + Terms copy, EN + ES
   optimize-images.mjs AVIF/WebP responsive pipeline
   inline-css.mjs      Minify + inline the stylesheet
   build-sitemap.mjs   Sitemap with git-derived lastmod
 docs/
+  FUNNEL-BLUEPRINT.md Section-by-section source of truth for the homepage
+  FUNNEL-RECOMMENDATIONS.md  The reasoning behind each funnel section
+  BUILD-NOTES.md      GENERATED — open items stripped from the mockup
   SEO-HANDBOOK.md     The full reference — performance, SEO, local, GEO
   SEO-PLAYBOOK.md     Service-page and city-page process
   LAUNCH-CHECKLIST.md Pre-launch and post-launch gates
 ```
 
-There is **no `index.html` yet** — the owner is sending the homepage code. Drop
-it in at the repo root, then run `npm run preflight` and work the findings.
+**The pages are generated, not hand-written.** `index.html`, `es/index.html`,
+and the four legal pages are build output. Editing them directly means the next
+build silently discards your change. Edit the source instead:
+
+| To change | Edit |
+|---|---|
+| Homepage structure or copy | re-export the design, then re-run `flatten-export.py` |
+| How the export is transformed | `scripts/flatten-export.py` |
+| Styling, motion, components | `assets/css/site.css` |
+| Legal copy (EN + ES) | `scripts/legal_content.py` |
+| NAP, pricing, service area | `site.config.json` |
+
+Rebuild:
+
+```bash
+python3 scripts/flatten-export.py <export.html>   # homepage EN + ES
+python3 scripts/build-legal.py                    # privacy + terms, EN + ES
+npm run preflight
+```
 
 **Deliberate structural choice:** the homepage is a real file served directly at
 `/`. There is no root redirect or rewrite. The predecessor site needed a forced

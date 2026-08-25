@@ -73,6 +73,32 @@ The audit fails the build on all of these, but check them consciously too:
 - [ ] FAQ schema matches the visible Q&A exactly
 - [ ] Validated at search.google.com/test/rich-results and validator.schema.org
 
+## Gate 4.5 — The funnel (this site is a sales funnel, not a brochure)
+
+Source of truth: `docs/FUNNEL-BLUEPRINT.md`. These are the items that decide
+whether the page earns anything.
+
+- [ ] **The free audit form posts to a real endpoint.** Set `forms.auditEndpoint`
+      in `site.config.json`. Until it is set, `site.js` deliberately refuses to
+      show a success screen and logs an error instead — a fake confirmation
+      loses the lead silently, which is worse than an error. This form captures
+      the ~90% of visitors who will not apply on visit one; the funnel review
+      calls it the single highest-leverage element on the page.
+- [ ] **Follow-up sequence exists behind the audit.** Most local leads convert on
+      the third or fourth touch. Without a sequence, the audit capture is a list
+      nobody emails.
+- [ ] **The audit is productized** (GBP check, mobile speed, listings gaps,
+      competitor comparison) so delivering one does not eat a day.
+- [ ] **The Apply flow exists.** Every primary CTA currently points at `#apply`.
+      Build the qualification flow, or point them at something real. A CTA that
+      scrolls to a section with no form is a dead end.
+- [ ] Application shows a progress indicator, and step 1 asks the minimum.
+- [ ] Conversion tracking fires on: CTA clicks, application start, application
+      complete, audit submit, phone clicks (blueprint, Technical guardrails).
+- [ ] Every claim on the page is true today — no invented counts, no sample
+      testimonials. See "Content integrity" in `CLAUDE.md`.
+- [ ] Guarantee copy never implies a promised number of leads or rankings.
+
 ## Gate 5 — Conversion (this is what the site is for)
 
 - [ ] **Contact form posts to a real backend and a test lead lands in an inbox.**

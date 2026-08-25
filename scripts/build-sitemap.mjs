@@ -24,7 +24,7 @@ const CONFIG = JSON.parse(readFileSync(join(ROOT, 'site.config.json'), 'utf8'));
 const ORIGIN = CONFIG.domain.origin.replace(/\/$/, '');
 const DRY = process.argv.includes('--dry');
 
-const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates']);
+const SKIP_DIRS = new Set(['node_modules', '.git', '.netlify', 'reports', '_src', 'docs', '_templates', 'design']);
 const SKIP_FILES = new Set(['404.html']);
 
 /** Priority + changefreq by depth and page type. Rough, honest signals. */

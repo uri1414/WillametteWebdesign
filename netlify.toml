@@ -95,3 +95,11 @@
   from = "/*"
   to = "/404.html"
   status = 404
+
+# Design sources are version-controlled but must never be served. publish = "."
+# means every committed path is otherwise public, so this is what keeps the
+# masters and the raw export markup off the web.
+[[redirects]]
+  from = "/design/*"
+  to = "/404.html"
+  status = 404
