@@ -140,6 +140,31 @@ def resolve_buttons(soup):
         node.replace_with(tag)
 
 
+
+# Label (either language) -> the canonical field name submitted to the backend.
+FIELD_NAMES = [
+    (("business", "negocio"), "business-name"),
+    (("website", "sitio"), "website"),
+    (("email", "correo"), "email"),
+    (("phone", "tel"), "phone"),
+    (("name", "nombre"), "name"),
+]
+
+
+def canonical_field_name(label, input_type):
+    """Stable, language-independent name for a form field."""
+    text = label.lower()
+    if input_type == "email":
+        return "email"
+    for needles, name in FIELD_NAMES:
+        if any(n in text for n in needles):
+            return name
+    # Fall back to an ASCII slug rather than emitting mangled accented bytes.
+    slug = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
+    return slug or "field"
+
+
+
 def resolve_inputs(soup):
     """<x-import Input> -> <label class="field"> with a real, named control."""
     for node in soup.find_all("x-import"):
@@ -151,9 +176,11 @@ def resolve_inputs(soup):
         placeholder = node.get("placeholder", "")
         input_type = node.get("type", "text")
 
-        # A stable name/id derived from the label, so the form actually submits
-        # something a backend can read.
-        slug = re.sub(r"[^a-z0-9]+", "-", label_text.lower()).strip("-") or "field"
+        # Field names are data keys, not UI. Both language builds must submit
+        # the SAME names or Netlify receives two different shapes under one form
+        # and the submissions list becomes unusable. (Deriving the name from the
+        # label also mangled accents: "Correo electronico" -> "correo-electr-nico".)
+        slug = canonical_field_name(label_text, input_type)
         field_id = f"audit-{slug}"
 
         label = soup.new_tag("label")
@@ -174,14 +201,88 @@ def resolve_inputs(soup):
         if input_type == "email":
             control["required"] = ""
             control["autocomplete"] = "email"
-        elif "business" in slug or "negocio" in slug:
+        elif slug == "business-name":
             control["required"] = ""
             control["autocomplete"] = "organization"
-        elif "website" in slug or "sitio" in slug:
+        elif slug == "website":
             control["autocomplete"] = "url"
         label.append(control)
 
         node.replace_with(label)
+
+
+
+# The free audit form is the funnel's soft-conversion path. Netlify Forms gives
+# it a real backend with no server to run: Netlify detects the form in the
+# static HTML at deploy time, and posts to "/" are captured instead of routed.
+NAP_CACHE = {}
+
+AUDIT_FORM_COPY = {
+    "en": {
+        "sending": "Sending\u2026",
+        "hp_label": "Leave this field empty",
+        "error": "Something went wrong. Please call {phone} or email {email}.",
+    },
+    "es": {
+        "sending": "Enviando\u2026",
+        "hp_label": "Deja este campo vac\u00edo",
+        "error": "Algo sali\u00f3 mal. Por favor llama al {phone} o escribe a {email}.",
+    },
+}
+
+
+def wire_audit_form(soup, form, lang):
+    copy = AUDIT_FORM_COPY[lang]
+
+    form["data-audit-form"] = ""
+    form["name"] = "audit"
+    form["method"] = "post"
+    form["action"] = "/"
+    form["data-netlify"] = "true"
+    form["data-netlify-honeypot"] = "company"
+    form["data-sending-label"] = copy["sending"]
+    # Localised failure copy, read by site.js. Handing over the phone number
+    # keeps a warm lead recoverable when the POST fails.
+    form["data-error-label"] = copy["error"].format(
+        phone=NAP_CACHE["phoneDisplay"], email=NAP_CACHE["email"])
+
+    # Netlify matches the submission to the form by this field.
+    hidden = soup.new_tag("input", type="hidden")
+    hidden["name"] = "form-name"
+    hidden["value"] = "audit"
+    form.insert(0, hidden)
+
+    # Both languages post to the same form so submissions land in one list;
+    # this keeps the lead's language with the lead.
+    lang_field = soup.new_tag("input", type="hidden")
+    lang_field["name"] = "language"
+    lang_field["value"] = lang
+    form.insert(1, lang_field)
+
+    # Honeypot. Hidden from people and from assistive tech, irresistible to
+    # bots. Named to match data-netlify-honeypot above.
+    hp_wrap = soup.new_tag("p")
+    hp_wrap["class"] = ["visually-hidden"]
+    hp_wrap["aria-hidden"] = "true"
+    hp_label = soup.new_tag("label")
+    hp_label.string = copy["hp_label"]
+    hp_input = soup.new_tag("input", type="text")
+    hp_input["name"] = "company"
+    hp_input["tabindex"] = "-1"
+    hp_input["autocomplete"] = "off"
+    hp_label.append(hp_input)
+    hp_wrap.append(hp_label)
+    form.append(hp_wrap)
+
+    # A live region so the outcome is announced, not just shown.
+    status = soup.new_tag("p")
+    status["data-audit-status"] = ""
+    status["role"] = "status"
+    status["aria-live"] = "polite"
+    status["hidden"] = ""
+    status["style"] = "font:600 14px var(--font-ui);color:var(--color-rust);margin:0"
+    form.append(status)
+
 
 
 def resolve_conditionals(soup, lang, notes):
@@ -247,7 +348,7 @@ def resolve_conditionals(soup, lang, notes):
         elif cond == "notSent":
             form = node.find("form")
             if form is not None:
-                form["data-audit-form"] = ""
+                wire_audit_form(soup, form, lang)
             unwrap(node)
         elif cond == "sent":
             box = node.find("div")
@@ -436,6 +537,70 @@ def swap_images(soup, lang):
             inner = pic.find("img")
             inner["style"] = style
         img.replace_with(pic)
+
+
+
+def extract_faqs(soup):
+    """Read the FAQ Q&A straight out of the rendered DOM.
+
+    FAQPage schema must mirror the visible Q&A exactly -- Google suppresses the
+    rich result otherwise, and the audit fails the build on a mismatch. Reading
+    the questions and answers from the DOM we just built is the only way to
+    guarantee they cannot drift: there is no second copy to fall out of sync.
+    """
+    faqs = []
+    for det in soup.find_all("details"):
+        summary = det.find("summary")
+        if summary is None:
+            continue
+
+        # The summary carries the +/- indicator glyphs alongside the question.
+        # Copy it, drop anything aria-hidden, and take what a reader actually
+        # sees -- otherwise the schema would contain "... ? + -".
+        q_node = BeautifulSoup(str(summary), "html.parser")
+        for junk in q_node.find_all(attrs={"aria-hidden": "true"}):
+            junk.decompose()
+        for junk in q_node.find_all(class_=re.compile(r"fq-(plus|minus|chev)")):
+            junk.decompose()
+        question = " ".join(q_node.get_text(" ", strip=True).split())
+
+        answer_parts = []
+        for sib in summary.next_siblings:
+            if getattr(sib, "get_text", None):
+                answer_parts.append(sib.get_text(" ", strip=True))
+            elif isinstance(sib, str):
+                answer_parts.append(sib.strip())
+        answer = " ".join(" ".join(answer_parts).split())
+
+        if question and answer:
+            faqs.append({"q": question, "a": answer})
+    return faqs
+
+
+def tag_footer_year(soup):
+    """Mark the copyright year so site.js can keep it current.
+
+    A hardcoded year is the kind of thing nobody notices until January, when
+    every page quietly looks abandoned.
+    """
+    footer = soup.find("footer")
+    if footer is None:
+        return
+    for span in footer.find_all("span"):
+        text = span.get_text(" ", strip=True)
+        m = re.search(r"(\u00a9|\(c\))\s*(\d{4})", text)
+        if not m:
+            continue
+        year = m.group(2)
+        before, _, after = text.partition(year)
+        span.clear()
+        span.append(before)
+        y = soup.new_tag("span")
+        y["data-year"] = ""
+        y.string = year
+        span.append(y)
+        span.append(after)
+        break
 
 
 def tag_header_parts(soup):
@@ -676,7 +841,7 @@ META = {
 }
 
 
-def build_head(lang, cfg, css):
+def build_head(lang, cfg, css, faqs=None):
     """The full <head>. Every tag here is required by scripts/audit.mjs."""
     m = META[lang]
     origin = cfg["domain"]["origin"]
@@ -738,6 +903,22 @@ def build_head(lang, cfg, css):
         ],
     }
 
+    # FAQPage, built from the visible Q&A so the two cannot disagree.
+    if faqs:
+        schema["@graph"].append({
+            "@type": "FAQPage",
+            "@id": f"{canonical}#faq",
+            "isPartOf": {"@id": f"{origin}/#website"},
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": f["q"],
+                    "acceptedAnswer": {"@type": "Answer", "text": f["a"]},
+                }
+                for f in faqs
+            ],
+        })
+
     hreflang = (
         f'<link rel="alternate" hreflang="en" href="{origin}/">\n'
         f'<link rel="alternate" hreflang="es" href="{origin}/es/">\n'
@@ -797,8 +978,8 @@ def build_head(lang, cfg, css):
 <meta name="twitter:description" content="{m['og_desc']}">
 <meta name="twitter:image" content="{og_image}">
 
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/assets/img/logo-badge-46.png" sizes="46x46" type="image/png">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 
 <!-- Self-hosted fonts, preloaded so styled text is not waiting on CSS parse. -->
@@ -838,6 +1019,7 @@ def main():
 
     out_root = pathlib.Path(args.out)
     cfg = json.loads((out_root / "site.config.json").read_text())
+    NAP_CACHE.update(cfg["nap"])
     css_src = (out_root / "assets/css/site.css").read_text()
 
     template, manifest = read_export(args.export)
@@ -860,6 +1042,7 @@ def main():
 
         fix_camel_attrs(soup)
         tag_header_parts(soup)
+        tag_footer_year(soup)
         resolve_conditionals(soup, lang, notes)
         resolve_buttons(soup)
         resolve_inputs(soup)
@@ -874,6 +1057,8 @@ def main():
         for node in soup.find_all("x-dc"):
             unwrap(node)
 
+        faqs = extract_faqs(soup)
+
         body = soup.find("body")
         fragment = "".join(str(c) for c in body.children) if body else str(soup)
 
@@ -886,7 +1071,7 @@ def main():
         page = (
             "<!doctype html>\n"
             f'<html lang="{lang}">\n<head>\n'
-            + build_head(lang, cfg, minify_css(css_src))
+            + build_head(lang, cfg, minify_css(css_src), faqs)
             + "\n</head>\n<body>\n"
             + f'<a class="skip" href="#main">{skip}</a>\n'
             + '<main id="main">\n'
@@ -900,7 +1085,8 @@ def main():
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(page, encoding="utf-8")
         all_notes[lang] = notes
-        print(f"{lang}: {dest.relative_to(out_root)}  {len(page)/1024:.1f} KB")
+        print(f"{lang}: {dest.relative_to(out_root)}  {len(page)/1024:.1f} KB  "
+              f"({len(faqs)} FAQ entries in schema)")
 
     notes_path = out_root / "docs/BUILD-NOTES.md"
     lines = [

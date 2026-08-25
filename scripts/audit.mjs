@@ -419,6 +419,51 @@ function auditFile(absPath) {
     }
   }
 
+  /* ===================== Forms =====================
+     A form is the site's whole reason for existing. These checks come from the
+     Fast Website Starter, which is the handbook turned into working code. */
+
+  const forms = [...raw.matchAll(/<form\b[^>]*>/gi)].map((m) => m[0]);
+  forms.forEach((form) => {
+    const name = attr(form, 'name') || '(unnamed)';
+    const action = attr(form, 'action');
+    const netlify = hasAttr(form, 'data-netlify') || /name=["']form-name["']/i.test(raw);
+
+    // A form that posts nowhere silently loses every lead that fills it in.
+    if (!action && !netlify) {
+      add('HIGH', '§G-launch', `<form ${name}> has no action and no backend wired — submissions go nowhere. A lead lost this way is invisible.`);
+    }
+
+    if (netlify && !/<input\b[^>]*name=["']form-name["']/i.test(raw)) {
+      add('HIGH', '§G-launch', `<form ${name}> uses data-netlify but has no hidden form-name input — Netlify cannot match the submission and will reject it.`);
+    }
+
+    // Public forms without a honeypot fill up with bot spam, which buries real leads.
+    const honeypot = attr(form, 'data-netlify-honeypot');
+    if (netlify && !honeypot) {
+      add('MEDIUM', '§G-launch', `<form ${name}> has no honeypot — expect bot submissions to bury real ones.`);
+    }
+    if (honeypot && !new RegExp(`name=["']${honeypot}["']`, 'i').test(raw)) {
+      add('HIGH', '§G-launch', `<form ${name}> declares honeypot "${honeypot}" but no field of that name exists — the trap is not armed.`);
+    }
+  });
+
+  // Every visible input needs a label a screen reader can reach.
+  const inputs = tagsOf(html, 'input').filter((i) => {
+    const t = (attr(i, 'type') || 'text').toLowerCase();
+    return !['hidden', 'submit', 'button'].includes(t);
+  });
+  inputs.forEach((input) => {
+    const id = attr(input, 'id');
+    const nm = attr(input, 'name') || '(unnamed)';
+    const labelled = (id && new RegExp(`<label\\b[^>]*for=["']${id}["']`, 'i').test(raw)) ||
+                     hasAttr(input, 'aria-label') || hasAttr(input, 'aria-labelledby');
+    const inLabel = new RegExp(`<label\\b[^>]*>(?:(?!</label>)[\\s\\S])*name=["']${nm}["']`, 'i').test(raw);
+    if (!labelled && !inLabel) {
+      add('MEDIUM', '§3.1', `Input "${nm}" has no associated label.`);
+    }
+  });
+
   /* ===================== Leftover predecessor branding ===================== */
 
   const STALE = [
@@ -485,6 +530,20 @@ if (files.length === 0) {
 }
 
 const results = files.map(auditFile);
+
+// Site-level checks, reported once rather than per page.
+if (!targets.length && !existsSync(join(ROOT, 'favicon.ico'))) {
+  results.push({
+    file: '(site)',
+    sizeKb: 0,
+    findings: [{
+      severity: 'LOW',
+      section: '§2.7',
+      message: 'No /favicon.ico at the repo root. Browsers and crawlers probe that exact path regardless of <link rel="icon">, so every cold visit logs a 404.',
+    }],
+  });
+}
+
 const all = results.flatMap((r) => r.findings);
 const tally = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
 all.forEach((f) => tally[f.severity]++);

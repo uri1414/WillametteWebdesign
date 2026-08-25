@@ -78,12 +78,18 @@ The audit fails the build on all of these, but check them consciously too:
 Source of truth: `docs/FUNNEL-BLUEPRINT.md`. These are the items that decide
 whether the page earns anything.
 
-- [ ] **The free audit form posts to a real endpoint.** Set `forms.auditEndpoint`
-      in `site.config.json`. Until it is set, `site.js` deliberately refuses to
-      show a success screen and logs an error instead — a fake confirmation
-      loses the lead silently, which is worse than an error. This form captures
-      the ~90% of visitors who will not apply on visit one; the funnel review
-      calls it the single highest-leverage element on the page.
+- [x] **The free audit form has a backend.** Wired to Netlify Forms — no server
+      to run. Verified: it POSTs urlencoded to `/` with `form-name=audit`, the
+      visitor's language, canonical field names in both languages, and an armed
+      honeypot.
+- [ ] **Turn on form notifications.** Netlify captures submissions but emails
+      nobody by default. Netlify → Forms → `audit` → Settings → Form
+      notifications → add `info@willametteweb.com`. **A captured-but-unnotified
+      form looks identical to a working one and loses every lead.**
+- [ ] **Submit a real test from the live site and confirm the email arrives.**
+      Do not skip this; it is the only thing that proves the chain works.
+- [ ] Confirm the honeypot is not catching real people (check Netlify's spam
+      folder after the first week).
 - [ ] **Follow-up sequence exists behind the audit.** Most local leads convert on
       the third or fourth touch. Without a sequence, the audit capture is a list
       nobody emails.

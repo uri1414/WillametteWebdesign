@@ -122,47 +122,56 @@
   /* -----------------------------------------------------------------------
      Free-audit form
 
-     The form posts to a real endpoint. Until one is configured it must not
-     pretend to succeed — a fake success screen loses the lead silently, which
-     is worse than an honest error.
+     Submits to Netlify Forms: Netlify detects the form in the deployed HTML
+     and captures POSTs to "/" rather than routing them. That means a real
+     backend with no server to run — but it only works on a Netlify deploy, so
+     locally the request will fail and the error path below is what you see.
+
+     The error path matters as much as the success path: a visitor who filled
+     the form is a warm lead, so a failure hands them the phone number rather
+     than a dead end.
      ----------------------------------------------------------------------- */
   var form = document.querySelector('[data-audit-form]');
   var success = document.querySelector('[data-audit-success]');
+  var status = document.querySelector('[data-audit-status]');
 
   if (form) {
     form.addEventListener('submit', function (e) {
-      var endpoint = form.getAttribute('action');
-
-      if (!endpoint) {
-        // No backend wired yet. Let the browser do nothing and say so loudly
-        // in the console rather than showing a success state that is a lie.
-        e.preventDefault();
-        console.error(
-          '[willamette] The audit form has no action endpoint, so this submission ' +
-          'went nowhere. Wire it up (see docs/LAUNCH-CHECKLIST.md, Gate 5) before launch.'
-        );
-        return;
-      }
-
       e.preventDefault();
+
+      // Honeypot: a real person never fills a field they cannot see. Bail
+      // silently so a bot learns nothing from the response.
+      if (form.company && form.company.value) return;
+
       var button = form.querySelector('button[type="submit"]');
+      var sending = form.getAttribute('data-sending-label') || 'Sending…';
+
       if (button) {
         button.setAttribute('aria-disabled', 'true');
         button.dataset.label = button.textContent;
-        button.textContent = form.getAttribute('data-sending-label') || 'Sending…';
+        button.textContent = sending;
+      }
+      if (status) {
+        status.hidden = false;
+        status.textContent = sending;
       }
 
-      fetch(endpoint, {
+      // Netlify Forms expects urlencoded, not multipart.
+      var body = new URLSearchParams();
+      new FormData(form).forEach(function (v, k) { body.append(k, v); });
+
+      fetch(form.getAttribute('action') || '/', {
         method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' }
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
       }).then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
+        form.reset();
         if (success) {
           form.hidden = true;
           success.hidden = false;
-          success.setAttribute('role', 'status');
-          success.focus && success.focus();
+        } else if (status) {
+          status.textContent = form.getAttribute('data-success-label') || 'Thank you.';
         }
       }).catch(function (err) {
         console.error('[willamette] audit form submission failed:', err);
@@ -170,9 +179,36 @@
           button.removeAttribute('aria-disabled');
           if (button.dataset.label) button.textContent = button.dataset.label;
         }
-        var msg = form.querySelector('[data-audit-error]');
-        if (msg) msg.hidden = false;
+        if (status) {
+          status.hidden = false;
+          status.textContent = form.getAttribute('data-error-label') ||
+            'Something went wrong. Please call (541) 497-9531.';
+        }
       });
     });
+  }
+
+  /* -----------------------------------------------------------------------
+     FAQ accordion — opening one closes the others.
+
+     Keeps the section scannable instead of letting it grow into a wall, and
+     means the answer you just opened is the one on screen.
+     ----------------------------------------------------------------------- */
+  var faqs = document.querySelectorAll('.faq-item');
+  for (var f = 0; f < faqs.length; f++) {
+    faqs[f].addEventListener('toggle', function () {
+      if (!this.open) return;
+      for (var g = 0; g < faqs.length; g++) {
+        if (faqs[g] !== this) faqs[g].open = false;
+      }
+    });
+  }
+
+  /* -----------------------------------------------------------------------
+     Footer year — so the copyright never silently goes stale.
+     ----------------------------------------------------------------------- */
+  var years = document.querySelectorAll('[data-year]');
+  for (var y = 0; y < years.length; y++) {
+    years[y].textContent = String(new Date().getFullYear());
   }
 })();

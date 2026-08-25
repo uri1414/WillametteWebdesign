@@ -145,6 +145,7 @@ def build(doc, kind, lang, cfg, css, today):
 <meta name="twitter:title" content="{escape(doc['title'])}">
 <meta name="twitter:description" content="{escape(doc['description'])}">
 <meta name="twitter:image" content="{origin}/assets/img/og-image.png">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter-latin.woff2" crossorigin>

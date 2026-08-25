@@ -45,6 +45,11 @@
     Cache-Control = "public, max-age=3600"
 
 [[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
   for = "/robots.txt"
   [headers.values]
     Cache-Control = "public, max-age=3600"
@@ -81,7 +86,11 @@
     #
     # 'unsafe-inline' on style-src is required while CSS is inlined for
     # render-blocking reasons (§2.4). script-src allows GA4 only.
-    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; upgrade-insecure-requests"
+    # connect-src and img-src cover the endpoints GA4 actually reaches: it beacons
+    # to a regional google-analytics host, sometimes to analytics.google.com, and
+    # falls back to a pixel on googletagmanager. Narrower than this and the
+    # report-only log fills with violations that are not real problems.
+    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; upgrade-insecure-requests"
 
 # ---------------------------------------------------------------------------
 # Redirects

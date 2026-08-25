@@ -149,13 +149,28 @@ These are enforced by `scripts/audit.mjs`. They come from `docs/SEO-HANDBOOK.md`
   `<script src=gtag.js>` in `<head>`. That pattern is worth ~66 KB of
   main-thread time and TBT is 30% of the Lighthouse score.
 
+**Forms (§G-launch)** — enforced by the audit, from the Fast Website Starter
+(`docs/FAST-STARTER-REFERENCE.md`):
+- Every form has a real backend. The audit fails the build on a form with no
+  `action` and no `data-netlify` — a form that posts nowhere loses leads
+  invisibly, which is the worst failure mode a marketing site has.
+- Netlify Forms needs the hidden `form-name` input to match a submission; the
+  audit checks it exists.
+- Public forms carry an armed honeypot, and the audit verifies the declared
+  honeypot field actually exists.
+- Field `name`s are canonical and identical across EN and ES. They are data
+  keys, not UI — deriving them from translated labels sends two different
+  shapes to one form and mangles accents.
+
 **SEO (§3)**
 - One unique `<title>` (~50–60 chars, keyword first, brand last), one unique
   meta description (~140–160), exactly one `<h1>`, logical H2/H3.
 - Self-referencing absolute canonical, trailing slash, apex host.
 - Folder-style URLs: `/services/website-design/`, lowercase, hyphenated.
-- `FAQPage` schema must match the visible Q&A **word for word**. (The
-  predecessor site shipped a mismatch here — the audit catches it now.)
+- `FAQPage` schema must match the visible Q&A **word for word**. It is
+  generated from the built DOM by `flatten-export.py`, so there is no second
+  copy to drift; the audit verifies the match either way. (The predecessor site
+  shipped a mismatch here.)
 - Every page in `sitemap.xml` with a real `lastmod`; no orphans.
 
 **Local (§4)** — this is the big lever for a local service business, often
@@ -194,6 +209,7 @@ scripts/
   inline-css.mjs      Minify + inline the stylesheet
   build-sitemap.mjs   Sitemap with git-derived lastmod
 docs/
+  FAST-STARTER-REFERENCE.md  The handbook as working code; what we adopted
   FUNNEL-BLUEPRINT.md Section-by-section source of truth for the homepage
   FUNNEL-RECOMMENDATIONS.md  The reasoning behind each funnel section
   BUILD-NOTES.md      GENERATED — open items stripped from the mockup
