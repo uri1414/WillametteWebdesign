@@ -40,9 +40,11 @@
       "Albany",
       "Corvallis",
       "Salem",
-      "Lebanon"
+      "Lebanon",
+      "Keizer",
+      "Woodburn"
     ],
-    "_todo": "These four are named in the approved funnel blueprint and in the site footer. Dedicated /web-design-<city>-or/ pages are a strong local-SEO play, but each must be >60% unique copy with real local specifics -- see docs/SEO-PLAYBOOK.md section 2. Swapping only the city name produces doorway pages and gets penalised."
+    "_todo": "Keizer and Woodburn were added to the original four to widen valley-wide coverage. Dedicated /web-design-<city>-or/ pages are a strong local-SEO play, but each must be >60% unique copy with real local specifics -- see docs/SEO-PLAYBOOK.md section 2. Swapping only the city name produces doorway pages and gets penalised. A /service-areas/ hub page covers the rest of the Willamette Valley without a dedicated page for every town."
   },
   "hours": null,
   "languages": [

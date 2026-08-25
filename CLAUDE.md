@@ -52,7 +52,7 @@ Section-by-section source of truth: `docs/FUNNEL-BLUEPRINT.md`.
   adding a `LocalBusiness` `PostalAddress` or geo coordinates. Until then the
   site says only "Based in Oregon" and the schema uses `areaServed` +
   `addressRegion`, which is correct for a service-area business — including on
-  the four city pages, which each explicitly disclose the service-area model
+  the six city pages, which each explicitly disclose the service-area model
   (see below) rather than implying a storefront in that city.
 - **Guarantee, billing and ownership terms.** The `/terms/` page carries visible
   `NEEDS_REVIEW` callouts for every clause that depends on the signed client
@@ -188,10 +188,12 @@ These are enforced by `scripts/audit.mjs`. They come from `docs/SEO-HANDBOOK.md`
 more than on-page SEO. Google Business Profile, identical NAP everywhere,
 citations, and a real review-generation process. See `docs/SEO-PLAYBOOK.md` §2
 before touching city pages: swapping only the city name into identical copy is
-the #1 mistake and gets treated as doorway pages. The four existing city pages
+the #1 mistake and gets treated as doorway pages. The six existing city pages
 each carry a genuinely unique intro and FAQ (verified: ~65-70% of each page's
 sentences are unique to it, not shared boilerplate) — keep that ratio if you
-add another city, not just a copy with the name swapped.
+add another city, not just a copy with the name swapped. `/service-areas/` is
+the honest way to cover the rest of the valley without a dedicated (and
+inevitably thinner) page for every town — see `build-service-areas.py` below.
 
 ---
 
@@ -215,7 +217,12 @@ index.html            Homepage (EN) — GENERATED
 es/index.html         Homepage (ES) — GENERATED
 privacy/, terms/      Legal pages, EN + ES — GENERATED
 web-design-<city>-or/ City landing pages, EN + ES — GENERATED
-  (albany, corvallis, salem, lebanon — the approved service area)
+  (albany, corvallis, salem, lebanon, keizer, woodburn — the approved
+  service area)
+service-areas/         Valley-wide hub page, EN + ES — GENERATED. Links every
+                      city page above plus honestly covers towns that don't
+                      have one; see SEO-PLAYBOOK.md §2 before adding more
+                      dedicated city pages instead of using this hub.
 scripts/
   audit.mjs           The handbook, executable. Gates the deploy.
   flatten-export.py   Design-tool export -> static EN + ES homepage
@@ -226,7 +233,13 @@ scripts/
                       flatten-export.py, not before
   city_content.py     Per-city intro + FAQ copy, EN + ES — genuinely unique
                       per city, not a template; see SEO-PLAYBOOK.md §2
-  build_lib.py        extract_faqs() + minify_css(), shared by the three
+  build-service-areas.py  The /service-areas/ hub page — also reuses the
+                      built homepage's header/footer, so after
+                      flatten-export.py; order relative to
+                      build-city-pages.py doesn't matter
+  build_lib.py        extract_faqs(), minify_css(), load_chrome() +
+                      rewrite_chrome_links() (reuse the homepage header/
+                      footer), service_areas_path() — shared by the
                       generators above (a hyphenated script name can't be
                       imported by another script, hence the separate module)
   optimize-images.mjs AVIF/WebP responsive pipeline
@@ -260,6 +273,7 @@ Rebuild:
 python3 scripts/flatten-export.py <export.html>   # homepage EN + ES — run first
 python3 scripts/build-legal.py                    # privacy + terms, EN + ES
 python3 scripts/build-city-pages.py                # city pages — needs the homepage's header/footer, so after flatten-export.py
+python3 scripts/build-service-areas.py             # /service-areas/ hub — also needs the homepage's header/footer
 npm run preflight
 ```
 

@@ -430,6 +430,13 @@ details[open] summary{color:#D5683C !important}
   background: var(--color-forest-faint);
   color: var(--color-rust);
 }
+.nav-dropdown__all {
+  margin-top: 4px;
+  padding-top: 10px !important;
+  border-top: 1px solid var(--border-rule);
+  color: var(--color-rust) !important;
+  font-weight: 700 !important;
+}
 
 .u-desktop .nav-dropdown { position: relative; }
 .u-desktop .nav-dropdown__menu {

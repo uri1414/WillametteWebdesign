@@ -1,13 +1,54 @@
 """
 Shared helpers for the HTML build scripts (flatten-export.py,
-build-city-pages.py). Split out into its own module because a script named
-with a hyphen -- the convention every build script here follows -- cannot be
-imported by another Python script; a plain module can.
+build-city-pages.py, build-service-areas.py). Split out into its own module
+because a script named with a hyphen -- the convention every build script
+here follows -- cannot be imported by another Python script; a plain module
+can.
 """
 
 import re
+import sys
 
 from bs4 import BeautifulSoup
+
+# Anchors that exist only on the homepage. Bare on that page; from any page
+# that reuses its header/footer verbatim they must point back at it
+# explicitly or the browser just fails to scroll (the id isn't on the
+# current page).
+HOMEPAGE_ANCHORS = {"how", "included", "about", "apply", "check"}
+
+
+def load_chrome(out_root, lang):
+    """Pull header + footer out of the already-built homepage.
+
+    Any secondary page (a city page, the service-areas hub) reuses these
+    VERBATIM rather than hand-duplicating the markup, so it never drifts
+    from the homepage's chrome -- run flatten-export.py first.
+    """
+    src = out_root / ("index.html" if lang == "en" else "es/index.html")
+    if not src.exists():
+        sys.exit(f"error: {src} does not exist -- run flatten-export.py first")
+    soup = BeautifulSoup(src.read_text(encoding="utf-8"), "html.parser")
+    header = soup.find("header")
+    footer = soup.find("footer")
+    if header is None or footer is None:
+        sys.exit(f"error: {src} is missing a <header> or <footer> to reuse")
+    return header, footer
+
+
+def rewrite_chrome_links(node, lang, current_url):
+    """Point homepage-only anchors and the language switch at the right place."""
+    home = "/" if lang == "en" else "/es/"
+    other_home_relative = current_url["es"] if lang == "en" else current_url["en"]
+
+    for a in node.find_all("a", href=True):
+        href = a["href"]
+        if href == "#top":
+            a["href"] = home
+        elif href.startswith("#") and href[1:] in HOMEPAGE_ANCHORS:
+            a["href"] = f"{home}{href}"
+        elif "lang-switch" in (a.get("class") or []):
+            a["href"] = other_home_relative
 
 
 def extract_faqs(soup):
@@ -45,6 +86,13 @@ def extract_faqs(soup):
         if question and answer:
             faqs.append({"q": question, "a": answer})
     return faqs
+
+
+def service_areas_path(lang):
+    """URL of the /service-areas/ hub page -- same slug in both languages,
+    matching how /privacy/ and /terms/ work, so every generator that links to
+    it (the nav, the footer, each city page) agrees on one path."""
+    return "/service-areas/" if lang == "en" else "/es/service-areas/"
 
 
 def minify_css(css):

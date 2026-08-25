@@ -10,7 +10,7 @@
 - Website: https://willametteweb.com
 - Email: info@willametteweb.com
 - Phone: (541) 497-9531
-- Service area: Albany, Corvallis, Salem, Lebanon, and surrounding Willamette Valley communities, Oregon
+- Service area: Albany, Corvallis, Salem, Lebanon, Keizer, Woodburn, and surrounding Willamette Valley communities, Oregon
 - Languages: English and Spanish (Español)
 
 ## What we do
@@ -63,10 +63,13 @@ website address, and email.
 
 - [Home (English)](https://willametteweb.com/)
 - [Inicio (Español)](https://willametteweb.com/es/)
+- [Service Areas](https://willametteweb.com/service-areas/) / [Español](https://willametteweb.com/es/service-areas/)
 - [Web Design in Albany, OR](https://willametteweb.com/web-design-albany-or/) / [Español](https://willametteweb.com/es/web-design-albany-or/)
 - [Web Design in Corvallis, OR](https://willametteweb.com/web-design-corvallis-or/) / [Español](https://willametteweb.com/es/web-design-corvallis-or/)
 - [Web Design in Salem, OR](https://willametteweb.com/web-design-salem-or/) / [Español](https://willametteweb.com/es/web-design-salem-or/)
 - [Web Design in Lebanon, OR](https://willametteweb.com/web-design-lebanon-or/) / [Español](https://willametteweb.com/es/web-design-lebanon-or/)
+- [Web Design in Keizer, OR](https://willametteweb.com/web-design-keizer-or/) / [Español](https://willametteweb.com/es/web-design-keizer-or/)
+- [Web Design in Woodburn, OR](https://willametteweb.com/web-design-woodburn-or/) / [Español](https://willametteweb.com/es/web-design-woodburn-or/)
 - [Privacy Policy](https://willametteweb.com/privacy/)
 - [Terms of Service](https://willametteweb.com/terms/)
 

@@ -12,6 +12,7 @@
     "css:check": "node scripts/inline-css.mjs --check",
     "sitemap": "node scripts/build-sitemap.mjs",
     "cities": "python3 scripts/build-city-pages.py",
+    "areas": "python3 scripts/build-service-areas.py",
     "serve": "npx --yes http-server . -p 8080 -c-1",
     "preflight": "npm run css:check && npm run sitemap && npm run audit"
   },

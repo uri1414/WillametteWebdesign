@@ -37,7 +37,7 @@ import sys
 
 from bs4 import BeautifulSoup
 
-from build_lib import extract_faqs, minify_css
+from build_lib import extract_faqs, minify_css, service_areas_path
 
 # Asset id -> the path it becomes in the repo. Ids come from the export's
 # manifest; anything not listed here is reported so it can't be silently lost.
@@ -962,11 +962,19 @@ def link_service_area(soup, lang, cfg):
 
     needle = "Albany \u00b7 Corvallis \u00b7 Salem \u00b7 Lebanon"
     target = soup.find(string=lambda t: t and needle in t)
-    if target is None:
-        return
+    if target is not None:
+        parent = target.parent
+    else:
+        # Re-run against chrome that was already linked by a previous run
+        # (e.g. patching a built page directly instead of re-flattening the
+        # export): locate the existing per-city link list by its href
+        # pattern rather than the original plain-text needle, so adding a
+        # city to site.config.json and re-running stays idempotent.
+        existing = soup.find("a", href=re.compile(r"^/(es/)?web-design-[a-z]+-or/$"))
+        if existing is None:
+            return
+        parent = existing.parent
 
-    tail = str(target).split("Lebanon", 1)[1]  # " + surrounding ..." / " + comunidades ..."
-    parent = target.parent
     parent.clear()
 
     prefix = "/" if lang == "en" else "/es/"
@@ -978,10 +986,18 @@ def link_service_area(soup, lang, cfg):
         a["style"] = "color:inherit"
         a.string = city
         parent.append(a)
-    parent.append(tail)
+
+    parent.append(" + ")
+    hub = soup.new_tag("a", href=service_areas_path(lang))
+    hub["class"] = ["h-opaque"]
+    hub["style"] = "color:inherit;text-decoration:underline"
+    hub.string = ("surrounding Oregon communities" if lang == "en"
+                  else "comunidades cercanas de Oregon")
+    parent.append(hub)
 
 
 NAV_SERVICE_AREA_LABEL = {"en": "SERVICE AREAS", "es": "ÁREAS DE SERVICIO"}
+NAV_ALL_AREAS_LABEL = {"en": "All service areas", "es": "Todas las áreas"}
 
 
 def add_service_area_nav(soup, lang, cfg):
@@ -1011,6 +1027,9 @@ def add_service_area_nav(soup, lang, cfg):
             a = soup.new_tag("a", href=f"{prefix}web-design-{city.lower()}-or/")
             a.string = city
             menu.append(a)
+        all_areas = soup.new_tag("a", href=service_areas_path(lang), **{"class": "nav-dropdown__all"})
+        all_areas.string = NAV_ALL_AREAS_LABEL[lang]
+        menu.append(all_areas)
         dd.append(menu)
         return dd
 

@@ -31,6 +31,15 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://willametteweb.com/service-areas/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/service-areas/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/service-areas/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/service-areas/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://willametteweb.com/web-design-albany-or/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-albany-or/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-albany-or/"/>
@@ -44,6 +53,15 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-corvallis-or/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-corvallis-or/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-corvallis-or/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/web-design-keizer-or/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-keizer-or/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-keizer-or/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-keizer-or/"/>
     <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -67,10 +85,28 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://willametteweb.com/web-design-woodburn-or/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-woodburn-or/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-woodburn-or/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-woodburn-or/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://willametteweb.com/es/privacy/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/privacy/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/privacy/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/privacy/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/service-areas/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/service-areas/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/service-areas/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/service-areas/"/>
     <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -94,6 +130,15 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://willametteweb.com/es/web-design-keizer-or/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-keizer-or/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-keizer-or/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-keizer-or/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://willametteweb.com/es/web-design-lebanon-or/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-lebanon-or/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-lebanon-or/"/>
@@ -107,6 +152,15 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-salem-or/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-salem-or/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-salem-or/"/>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/web-design-woodburn-or/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-woodburn-or/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-woodburn-or/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/web-design-woodburn-or/"/>
     <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

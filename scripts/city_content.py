@@ -398,4 +398,208 @@ CITIES = [
             ],
         },
     },
+    {
+        "slug": "keizer",
+        "name": "Keizer",
+        "county": "Marion County",
+        "en": {
+            "title": "Web Design in Keizer, OR | Willamette Web Design",
+            "description": ("A complete online presence for Keizer, Oregon businesses — "
+                            "website, local SEO, Google Business, listings — built in 30 "
+                            "days. Bilingual. Free presence check."),
+            "h1": "Web Design & Local SEO in Keizer, Oregon",
+            "lead": ("A complete local presence for Keizer businesses — website, "
+                    "Google, local SEO, and the systems that turn searches into "
+                    "customers — built and connected in 30 days."),
+            "intro": [
+                ("Keizer is its own incorporated city in Marion County, sitting "
+                 "immediately north of Salem along the Willamette River — sharing "
+                 "the Salem-Keizer school district and metro area, but with its own "
+                 "city government and its own River Road business corridor. A lot "
+                 "of search results still lump Keizer in with its bigger neighbor, "
+                 "which means a Keizer business can lose the customers searching by "
+                 "the name of their own town."),
+                ("The Willamette 30-Day Program builds and connects a Keizer "
+                 "business's whole local presence — a fast, mobile-first website, a "
+                 "Google Business Profile set up to actually surface for Keizer "
+                 "searches and not just Salem ones, matching local listings, and a "
+                 "lead-capture path that works. Built in 30 days, in English or "
+                 "Spanish."),
+            ],
+            "faq": [
+                (
+                    "Is Willamette Web Design based in Keizer?",
+                    "We're a service-area business covering the Mid-Willamette "
+                    "Valley, not a storefront in one city — the program runs by "
+                    "call, email, and video, so a Keizer business gets full "
+                    "attention without us needing a local office.",
+                ),
+                (
+                    "Most of our customers search for \"Salem\" businesses — does a "
+                    "Keizer page even help?",
+                    "Yes — we set up your Google Business Profile and site to "
+                    "target Keizer specifically as well as the shared Salem-Keizer "
+                    "market, so you show up for both instead of disappearing into a "
+                    "bigger neighbor's search results.",
+                ),
+                (
+                    "Do you offer the program in Spanish for Keizer clients?",
+                    "Sí — the entire program runs in English or Spanish, from the "
+                    "first call to the finished site.",
+                ),
+            ],
+        },
+        "es": {
+            "title": "Diseño Web en Keizer, OR | Willamette Web Design",
+            "description": ("Una presencia en línea completa para negocios de Keizer, "
+                            "Oregon — sitio web, SEO local, Google Business, directorios "
+                            "— en 30 días. Bilingüe. Revisión gratis."),
+            "h1": "Diseño Web y SEO Local en Keizer, Oregon",
+            "lead": ("Una presencia local completa para negocios de Keizer — sitio "
+                    "web, Google, SEO local y los sistemas que convierten búsquedas "
+                    "en clientes — construida y conectada en 30 días."),
+            "intro": [
+                ("Keizer es su propia ciudad incorporada en el condado de Marion, "
+                 "justo al norte de Salem junto al río Willamette — comparte el "
+                 "distrito escolar Salem-Keizer y el área metropolitana, pero tiene "
+                 "su propio gobierno municipal y su propio corredor de negocios en "
+                 "River Road. Muchos resultados de búsqueda todavía confunden a "
+                 "Keizer con su vecino más grande, lo que significa que un negocio "
+                 "de Keizer puede perder a los clientes que buscan por el nombre de "
+                 "su propio pueblo."),
+                ("El Programa de 30 Días de Willamette construye y conecta toda la "
+                 "presencia local de un negocio de Keizer — un sitio web rápido y "
+                 "diseñado primero para el celular, un Perfil de Negocio de Google "
+                 "configurado para aparecer en búsquedas de Keizer y no solo de "
+                 "Salem, directorios locales consistentes, y una vía de contacto "
+                 "que funciona. Construido en 30 días, en inglés o español."),
+            ],
+            "faq": [
+                (
+                    "¿Willamette Web Design tiene oficina en Keizer?",
+                    "Somos un negocio de área de servicio que cubre el valle medio "
+                    "de Willamette, no una oficina en una sola ciudad — el programa "
+                    "funciona por llamada, correo y video, así que un negocio en "
+                    "Keizer recibe atención completa sin que necesitemos oficina "
+                    "local.",
+                ),
+                (
+                    "La mayoría de nuestros clientes buscan negocios de \"Salem\" — "
+                    "¿de verdad ayuda una página de Keizer?",
+                    "Sí — configuramos tu Perfil de Negocio de Google y tu sitio "
+                    "para aparecer tanto en búsquedas de Keizer como en el mercado "
+                    "compartido de Salem-Keizer, así apareces en ambos en lugar de "
+                    "perderte entre los resultados de un vecino más grande.",
+                ),
+                (
+                    "¿Ofrecen el programa en español para clientes de Keizer?",
+                    "Sí — todo el programa funciona en inglés o español, desde la "
+                    "primera llamada hasta el sitio terminado.",
+                ),
+            ],
+        },
+    },
+    {
+        "slug": "woodburn",
+        "name": "Woodburn",
+        "county": "Marion County",
+        "en": {
+            "title": "Web Design in Woodburn, OR | Willamette Web Design",
+            "description": ("A complete online presence for Woodburn, Oregon "
+                            "businesses — website, local SEO, Google Business, "
+                            "listings — built in 30 days. Bilingual. Free presence "
+                            "check."),
+            "h1": "Web Design & Local SEO in Woodburn, Oregon",
+            "lead": ("A complete local presence for Woodburn businesses — website, "
+                    "Google, local SEO, and the systems that turn searches into "
+                    "customers — built and connected in 30 days."),
+            "intro": [
+                ("Woodburn sits at the junction of I-5 and Highway 214, roughly "
+                 "halfway between Salem and Portland, and has one of the highest "
+                 "shares of Latino residents and Spanish speakers of any city in "
+                 "Oregon. For a Woodburn business, a Spanish-language site isn't a "
+                 "nice-to-have add-on — for a large share of the customer base, "
+                 "it's the version of the site that actually gets read."),
+                ("The Willamette 30-Day Program builds a genuinely bilingual local "
+                 "presence for a Woodburn business — a real Spanish page, not a "
+                 "machine translation bolted onto an English site, a Google "
+                 "Business Profile and local listings set up correctly in both "
+                 "languages, and a lead-capture path that works either way a "
+                 "customer searches. Built and connected in 30 days."),
+            ],
+            "faq": [
+                (
+                    "Is Willamette Web Design based in Woodburn?",
+                    "We're a service-area business covering the Mid-Willamette "
+                    "Valley, not a storefront in one city — the program runs by "
+                    "call, email, and video, so a Woodburn business gets full "
+                    "attention without us needing a local office.",
+                ),
+                (
+                    "Is the Spanish site a real translation, not just Google "
+                    "Translate?",
+                    "Yes — every page is written in Spanish by a person, not "
+                    "machine-translated, and it lives at its own indexable URL, not "
+                    "a script that swaps text on the same page.",
+                ),
+                (
+                    "Do you handle both the English and Spanish sides of local "
+                    "SEO — Google Business, listings, all of it?",
+                    "Yes — Google Business Profile, local listings, and lead "
+                    "capture are all set up to work in both languages, not just "
+                    "the English side with Spanish bolted on.",
+                ),
+            ],
+        },
+        "es": {
+            "title": "Diseño Web en Woodburn, OR | Willamette Web Design",
+            "description": ("Una presencia en línea completa para negocios de "
+                            "Woodburn, Oregon — sitio web, SEO local, Google "
+                            "Business, directorios — en 30 días. Bilingüe. Revisión "
+                            "gratis."),
+            "h1": "Diseño Web y SEO Local en Woodburn, Oregon",
+            "lead": ("Una presencia local completa para negocios de Woodburn — "
+                    "sitio web, Google, SEO local y los sistemas que convierten "
+                    "búsquedas en clientes — construida y conectada en 30 días."),
+            "intro": [
+                ("Woodburn está en el cruce de la I-5 y la autopista 214, casi a "
+                 "medio camino entre Salem y Portland, y tiene una de las "
+                 "proporciones más altas de residentes latinos e hispanohablantes "
+                 "de cualquier ciudad de Oregon. Para un negocio de Woodburn, un "
+                 "sitio en español no es un extra opcional — para gran parte de la "
+                 "clientela, es la versión del sitio que realmente se lee."),
+                ("El Programa de 30 Días de Willamette construye una presencia "
+                 "local genuinamente bilingüe para un negocio de Woodburn — una "
+                 "página en español real, no una traducción automática pegada a un "
+                 "sitio en inglés, un Perfil de Negocio de Google y directorios "
+                 "locales bien configurados en ambos idiomas, y una vía de contacto "
+                 "que funciona sin importar en qué idioma busque el cliente. "
+                 "Construida y conectada en 30 días."),
+            ],
+            "faq": [
+                (
+                    "¿Willamette Web Design tiene oficina en Woodburn?",
+                    "Somos un negocio de área de servicio que cubre el valle medio "
+                    "de Willamette, no una oficina en una sola ciudad — el programa "
+                    "funciona por llamada, correo y video, así que un negocio en "
+                    "Woodburn recibe atención completa sin que necesitemos oficina "
+                    "local.",
+                ),
+                (
+                    "¿El sitio en español es una traducción real, no solo Google "
+                    "Translate?",
+                    "Sí — cada página está escrita en español por una persona, no "
+                    "traducida por máquina, y vive en su propia URL indexable, no "
+                    "en un script que cambia el texto en la misma página.",
+                ),
+                (
+                    "¿Manejan el SEO local tanto en inglés como en español — "
+                    "Google Business, directorios, todo?",
+                    "Sí — el Perfil de Negocio de Google, los directorios locales "
+                    "y la captura de clientes están configurados para funcionar en "
+                    "ambos idiomas, no solo en inglés con español añadido después.",
+                ),
+            ],
+        },
+    },
 ]

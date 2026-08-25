@@ -25,13 +25,14 @@ from html import escape
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from build_lib import extract_faqs, minify_css  # noqa: E402
+from build_lib import (  # noqa: E402
+    extract_faqs,
+    load_chrome,
+    minify_css,
+    rewrite_chrome_links,
+    service_areas_path,
+)
 from city_content import CITIES  # noqa: E402
-
-# Anchors that exist only on the homepage. Bare on that page; from anywhere
-# else they must point back at it explicitly or the browser just fails to
-# scroll (the id isn't on the current page).
-HOMEPAGE_ANCHORS = {"how", "included", "about", "apply", "check"}
 
 LABELS = {
     "en": {
@@ -47,6 +48,7 @@ LABELS = {
         "faq_kicker": "COMMON QUESTIONS",
         "other_cities_kicker": "MID-WILLAMETTE VALLEY",
         "other_cities_heading": "Also serving nearby",
+        "all_areas_cta": "All service areas",
         "final_heading": "Let's build something that brings you business.",
         "final_cta": "Apply for the 30-Day Program",
         "final_note": "Takes about 2 minutes.",
@@ -67,6 +69,7 @@ LABELS = {
         "faq_kicker": "PREGUNTAS FRECUENTES",
         "other_cities_kicker": "VALLE MEDIO DE WILLAMETTE",
         "other_cities_heading": "También servimos cerca",
+        "all_areas_cta": "Todas las áreas de servicio",
         "final_heading": "Construyamos algo que te traiga clientes.",
         "final_cta": "Aplica al Programa de 30 Días",
         "final_note": "Toma unos 2 minutos.",
@@ -75,34 +78,6 @@ LABELS = {
         "trust_bilingual": "Inglés y Español",
     },
 }
-
-
-def load_chrome(out_root, lang):
-    """Pull header + footer out of the already-built homepage."""
-    src = out_root / ("index.html" if lang == "en" else "es/index.html")
-    if not src.exists():
-        sys.exit(f"error: {src} does not exist -- run flatten-export.py first")
-    soup = BeautifulSoup(src.read_text(encoding="utf-8"), "html.parser")
-    header = soup.find("header")
-    footer = soup.find("footer")
-    if header is None or footer is None:
-        sys.exit(f"error: {src} is missing a <header> or <footer> to reuse")
-    return header, footer
-
-
-def rewrite_chrome_links(node, lang, current_url):
-    """Point homepage-only anchors and the language switch at the right place."""
-    home = "/" if lang == "en" else "/es/"
-    other_home_relative = current_url["es"] if lang == "en" else current_url["en"]
-
-    for a in node.find_all("a", href=True):
-        href = a["href"]
-        if href == "#top":
-            a["href"] = home
-        elif href.startswith("#") and href[1:] in HOMEPAGE_ANCHORS:
-            a["href"] = f"{home}{href}"
-        elif "lang-switch" in (a.get("class") or []):
-            a["href"] = other_home_relative
 
 
 def slugify_path(lang, slug):
@@ -291,6 +266,10 @@ def build_body(soup, lang, city, cfg):
         link["class"] = ["btn", "btn--secondary", "btn--sm", "lift"]
         link.string = other["name"]
         oth_row.append(link)
+    all_areas_link = soup.new_tag("a", href=service_areas_path(lang))
+    all_areas_link["class"] = ["btn", "btn--ghost", "btn--sm", "lift"]
+    all_areas_link.string = lab["all_areas_cta"] + " →"
+    oth_row.append(all_areas_link)
     others.append(oth_eyebrow)
     others.append(oth_h2)
     others.append(oth_row)
