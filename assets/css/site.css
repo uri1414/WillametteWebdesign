@@ -389,6 +389,69 @@ details[open] summary{color:#D5683C !important}
 .nav-link:hover::after,
 .nav-link:focus-visible::after { transform: scaleX(1); transform-origin: left; }
 
+/* --- Nav "Service Areas" dropdown ---
+   A <details>/<summary> menu: native and keyboard-accessible with no JS,
+   same accordion pattern the FAQ already uses. Desktop flyouts absolutely;
+   inside the mobile drawer it just expands the list in place. */
+.nav-dropdown > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: 700 12.5px var(--font-ui);
+  letter-spacing: .08em;
+  color: var(--color-forest);
+}
+.nav-dropdown > summary::-webkit-details-marker { display: none; }
+.nav-dropdown > summary::after {
+  content: "▾";
+  font-size: 10px;
+  transition: transform .2s ease;
+}
+.nav-dropdown[open] > summary::after { transform: rotate(180deg); }
+
+.nav-dropdown__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-dropdown__menu a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font: 600 13.5px var(--font-ui);
+  color: var(--color-forest);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav-dropdown__menu a:hover,
+.nav-dropdown__menu a:focus-visible {
+  background: var(--color-forest-faint);
+  color: var(--color-rust);
+}
+
+.u-desktop .nav-dropdown { position: relative; }
+.u-desktop .nav-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  z-index: 60;
+  min-width: 170px;
+  background: var(--color-cream);
+  border: 1px solid var(--border-rule);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 8px;
+}
+
+.drawer .nav-dropdown {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-forest-faint);
+}
+.drawer .nav-dropdown > summary { font-size: 14px; }
+.drawer .nav-dropdown__menu { margin-top: 8px; padding-left: 4px; }
+
 /* --- FAQ accordion ---
    The chevron rotates; the panel fades and rises. Height is intentionally not
    animated: <details> has no fixed end height, and animating it would force

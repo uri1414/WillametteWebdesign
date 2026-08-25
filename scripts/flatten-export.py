@@ -949,10 +949,7 @@ def link_service_area(soup, lang, cfg):
     Service Area dropdown in the nav + the footer" -- without this, the new
     /web-design-<city>-or/ pages have no path in from the site's only
     well-linked page, and a crawler has to find them through the sitemap
-    alone. The main nav stays untouched on purpose: the funnel blueprint
-    deliberately kept it to three links so nothing competes with Apply, and a
-    footer link list serves the same discovery purpose without disturbing
-    that.
+    alone. The nav half of that is add_service_area_nav(), below.
 
     The slug here (city name, lowercased) must match slugify_path() in
     build-city-pages.py -- true for the four approved cities today, but if a
@@ -982,6 +979,56 @@ def link_service_area(soup, lang, cfg):
         a.string = city
         parent.append(a)
     parent.append(tail)
+
+
+NAV_SERVICE_AREA_LABEL = {"en": "SERVICE AREAS", "es": "ÁREAS DE SERVICIO"}
+
+
+def add_service_area_nav(soup, lang, cfg):
+    """Add the "Service Area" dropdown SEO-PLAYBOOK.md sec.2 step 5 calls for.
+
+    The footer link list (link_service_area, above) gives crawlers a path in,
+    but a human visitor never scrolls to the footer looking for navigation --
+    the header nav is the only place people actually look. A <details> menu
+    keeps this native and keyboard-accessible with zero JS, matching how the
+    FAQ accordions already work on this site.
+    """
+    cities = (cfg.get("serviceArea") or {}).get("cities") or []
+    header = soup.find("header")
+    if header is None or not cities:
+        return
+
+    prefix = "/" if lang == "en" else "/es/"
+    label = NAV_SERVICE_AREA_LABEL[lang]
+
+    def build_dropdown():
+        dd = soup.new_tag("details", **{"class": "nav-dropdown"})
+        summary = soup.new_tag("summary")
+        summary.string = label
+        dd.append(summary)
+        menu = soup.new_tag("div", **{"class": "nav-dropdown__menu"})
+        for city in cities:
+            a = soup.new_tag("a", href=f"{prefix}web-design-{city.lower()}-or/")
+            a.string = city
+            menu.append(a)
+        dd.append(menu)
+        return dd
+
+    desktop_nav = header.select_one(".u-desktop nav")
+    if desktop_nav is not None:
+        lang_a = desktop_nav.find("a", class_="lang-switch")
+        if lang_a is not None and lang_a.parent is not None:
+            lang_a.parent.insert_before(build_dropdown())
+        else:
+            desktop_nav.append(build_dropdown())
+
+    drawer_nav = header.find("nav", class_="drawer")
+    if drawer_nav is not None:
+        lang_a = drawer_nav.find("a", class_="lang-switch")
+        if lang_a is not None:
+            lang_a.insert_before(build_dropdown())
+        else:
+            drawer_nav.append(build_dropdown())
 
 
 def fix_orphan_apply_button(soup):
@@ -1270,6 +1317,7 @@ def main():
         fix_unverified_claims(soup, lang, notes)
         wire_contact_and_legal(soup, lang, cfg)
         link_service_area(soup, lang, cfg)
+        add_service_area_nav(soup, lang, cfg)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)
