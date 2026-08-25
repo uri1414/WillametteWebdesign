@@ -1061,6 +1061,79 @@ def add_service_area_nav(soup, lang, cfg):
             drawer_nav.append(build_dropdown())
 
 
+PRESENCE_CHECK_CARD = {
+    "en": {
+        "eyebrow": "FREE PRESENCE CHECK",
+        "amount": "Free",
+        "body": ("No commitment — a written report on exactly where you're "
+                 "losing local customers. Yours to keep, whether you hire us "
+                 "or not."),
+        "cta": "Get my free presence check",
+    },
+    "es": {
+        "eyebrow": "REVISIÓN DE PRESENCIA GRATIS",
+        "amount": "Gratis",
+        "body": ("Sin compromiso — un informe escrito que muestra exactamente "
+                 "dónde estás perdiendo clientes locales. Es tuyo, nos "
+                 "contrates o no."),
+        "cta": "Obtén mi revisión de presencia",
+    },
+}
+
+
+def add_presence_check_card(soup, lang):
+    """Add a third card to the pricing grid for the free presence check.
+
+    The "value + pricing" section only ever showed the two paid tiers
+    (one-time launch, ongoing management) -- the soft-conversion path had no
+    presence here at all, even though CLAUDE.md calls the presence check "the
+    single highest-leverage element on the page". This is a teaser card that
+    matches the other two visually and links to the real form at #check
+    further down the page, not a second copy of the form itself (a duplicate
+    <form name="presence-check"> would confuse Netlify Forms' detection and
+    collide on field ids).
+    """
+    grid = soup.find("div", style=lambda s: s and
+                      "grid-template-columns:repeat(auto-fit,minmax(280px,1fr))" in s)
+    if grid is None:
+        return
+    cards = grid.find_all("div", recursive=False)
+    if len(cards) != 2:
+        return  # already patched, or the export's structure changed
+
+    copy = PRESENCE_CHECK_CARD[lang]
+
+    card = soup.new_tag("div", **{"class": "lift"})
+    card["style"] = "border:1px solid var(--color-river);border-radius:10px;padding:32px"
+
+    eyebrow = soup.new_tag("div")
+    eyebrow["style"] = "font:700 12px var(--font-ui);letter-spacing:.1em;color:var(--color-river)"
+    eyebrow.string = copy["eyebrow"]
+
+    amount = soup.new_tag("h3", **{"aria-label": f"{copy['eyebrow']} — {copy['amount']}"})
+    amount["style"] = "font:800 46px/1 var(--font-display);color:var(--color-forest);margin-top:10px"
+    amount.string = copy["amount"]
+
+    body = soup.new_tag("p")
+    body["style"] = "font:400 15px/1.6 var(--font-ui);color:var(--text-body);margin:14px 0 0"
+    body.string = copy["body"]
+
+    cta_wrap = soup.new_tag("div")
+    cta_wrap["style"] = "margin-top:22px"
+    cta = soup.new_tag("a", href="#check", **{"class": "btn btn--secondary"})
+    cta.append(copy["cta"] + " ")
+    arw = soup.new_tag("span", **{"aria-hidden": "true", "class": "arw"})
+    arw.string = "→"
+    cta.append(arw)
+    cta_wrap.append(cta)
+
+    card.append(eyebrow)
+    card.append(amount)
+    card.append(body)
+    card.append(cta_wrap)
+    grid.append(card)
+
+
 def fix_orphan_apply_button(soup):
     """The Final CTA's Apply button has no destination -- fix it.
 
@@ -1348,6 +1421,7 @@ def main():
         wire_contact_and_legal(soup, lang, cfg)
         link_service_area(soup, lang, cfg)
         add_service_area_nav(soup, lang, cfg)
+        add_presence_check_card(soup, lang)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)
