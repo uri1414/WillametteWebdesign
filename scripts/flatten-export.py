@@ -1332,6 +1332,272 @@ def add_track_record_card(soup, lang):
     grid.append(card)
 
 
+def rebuild_scarcity_card(soup, lang):
+    """Replace the 3rd (dark) card in section 07's grid with a clean,
+    honest-only version -- no live enrolled/remaining count.
+
+    The export left this card structurally different per language: EN's
+    headline read the approved HONEST_SCARCITY line, but ES's headline slot
+    held a stale "Solo quedan 2 lugares este mes" instead, and both
+    languages carried a trailing "N currently enrolled" row that goes stale
+    the moment it's written (see CLAUDE.md's honesty rule -- this is the
+    same "Only 2 spots left" pattern the blueprint says was already
+    removed). Rebuilding from HONEST_SCARCITY directly avoids patching
+    already-mismatched per-language markup.
+    """
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("07 Guarantee")})
+    if section is None:
+        return
+    grid = section.find("div", style=lambda s: s and
+                         "grid-template-columns:repeat(auto-fit,minmax(280px,1fr))" in s)
+    if grid is None:
+        return
+    card = grid.find("div", style=lambda s: s and "background:var(--color-forest)" in s)
+    if card is None:
+        return
+
+    copy = HONEST_SCARCITY[lang]
+    card.clear()
+
+    eyebrow_row = soup.new_tag("div")
+    eyebrow_row["style"] = "display:flex;align-items:center;gap:8px"
+    dot = soup.new_tag("span")
+    dot["style"] = ("width:8px;height:8px;border-radius:50%;background:var(--color-rust);"
+                     "box-shadow:0 0 0 0 rgba(213,104,60,.6);animation:wwdpulse 1.8s ease-out infinite")
+    eyebrow = soup.new_tag("span")
+    eyebrow["style"] = "font:700 12px var(--font-ui);letter-spacing:.1em;color:var(--color-gold)"
+    eyebrow.string = copy["eyebrow"]
+    eyebrow_row.append(dot)
+    eyebrow_row.append(eyebrow)
+
+    headline = soup.new_tag("div")
+    headline["style"] = ("font:800 clamp(26px,2.4vw,32px)/1.15 var(--font-display);"
+                          "color:var(--color-cream);margin-top:12px")
+    headline.string = copy["headline"]
+
+    body = soup.new_tag("p")
+    body["style"] = "font:400 14.5px/1.6 var(--font-ui);color:rgba(243,231,206,.75);margin:14px 0 0"
+    body.string = copy["body"]
+
+    card.append(eyebrow_row)
+    card.append(headline)
+    card.append(body)
+
+
+def remove_duplicate_scarcity_section(soup):
+    """Delete the standalone Scarcity band.
+
+    Its message now lives, correctly and without a stale live count, inside
+    07's rebuilt dark card (see rebuild_scarcity_card). Keeping both said the
+    same thing twice, and this one carried the fabricated "3 enrolled / 2
+    spots left" claim CLAUDE.md documents as already removed.
+    """
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("11 Scarcity")})
+    if section is not None:
+        section.decompose()
+
+
+def remove_cost_of_inaction_section(soup):
+    """Drop the loss-aversion band entirely (owner decision: leaner page,
+    not carried into the redesign)."""
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("04 Cost of inaction")})
+    if section is not None:
+        section.decompose()
+
+
+PROOF_CARDS = {
+    "en": {
+        "eyebrow": "REAL RESULTS",
+        "heading": "Already live. Already working.",
+        "sub": ("Two Willamette Valley businesses went through this exact program "
+                "— see what they got, in about two weeks."),
+        "link": "See the full program these came from →",
+        "projects": [
+            {
+                "slug": "cleaning", "url": "albanyprocleaning.com",
+                "href": "https://albanyprocleaning.com",
+                "name": "Albany Pro Cleaning",
+                "desc": "Reliable, high-quality cleaning for homes and businesses in Albany, Oregon.",
+                "chips": "Website · Local SEO · Google Business",
+                "alt": "Screenshot of the Albany Pro Cleaning website homepage",
+                "live": "● Live", "cta": "Visit Site →",
+            },
+            {
+                "slug": "junk", "url": "albanyjunkremoval.org",
+                "href": "https://albanyjunkremoval.org",
+                "name": "Albany Junk Removal",
+                "desc": ("Fast, fully insured junk removal and cleanouts in Albany, Oregon "
+                         "and the Mid-Willamette Valley."),
+                "chips": "Website · Local SEO · Google Business",
+                "alt": "Screenshot of the Albany Junk Removal website homepage",
+                "live": "● Live", "cta": "Visit Site →",
+            },
+        ],
+    },
+    "es": {
+        "eyebrow": "RESULTADOS REALES",
+        "heading": "Ya en línea. Ya funcionando.",
+        "sub": ("Dos negocios del Valle de Willamette pasaron por este mismo programa "
+                "— mira lo que obtuvieron, en cerca de dos semanas."),
+        "link": "Ve el programa completo →",
+        "projects": [
+            {
+                "slug": "cleaning", "url": "albanyprocleaning.com",
+                "href": "https://albanyprocleaning.com",
+                "name": "Albany Pro Cleaning",
+                "desc": "Limpieza confiable y de alta calidad para casas y negocios en Albany, Oregon.",
+                "chips": "Sitio Web · SEO Local · Google Business",
+                "alt": "Captura de pantalla de la página de inicio de Albany Pro Cleaning",
+                "live": "● En línea", "cta": "Visitar Sitio →",
+            },
+            {
+                "slug": "junk", "url": "albanyjunkremoval.org",
+                "href": "https://albanyjunkremoval.org",
+                "name": "Albany Junk Removal",
+                "desc": ("Remoción de basura rápida y totalmente asegurada en Albany, "
+                         "Oregon y el valle medio de Willamette."),
+                "chips": "Sitio Web · SEO Local · Google Business",
+                "alt": "Captura de pantalla de la página de inicio de Albany Junk Removal",
+                "live": "● En línea", "cta": "Visitar Sitio →",
+            },
+        ],
+    },
+}
+
+
+def _proof_project_card_html(p):
+    return (
+        f'<div class="lift" style="background:var(--color-cream-raised);border:1px solid var(--border-rule);'
+        f'border-radius:12px;overflow:hidden;box-shadow:var(--shadow-card)">'
+        f'<div style="background:var(--color-forest);padding:10px 16px;display:flex;align-items:center;gap:8px">'
+        f'<span style="width:9px;height:9px;border-radius:50%;background:var(--color-rust)"></span>'
+        f'<span style="width:9px;height:9px;border-radius:50%;background:var(--color-gold)"></span>'
+        f'<span style="width:9px;height:9px;border-radius:50%;background:var(--color-sage)"></span>'
+        f'<span style="margin-left:10px;font:400 12px var(--font-ui);color:var(--color-cream);opacity:.75">{p["url"]}</span>'
+        f'</div>'
+        f'<div style="position:relative;width:100%;aspect-ratio:16/10">'
+        f'<picture>'
+        f'<source sizes="(max-width:768px) 100vw, 480px" srcset="/assets/img/proj-{p["slug"]}-480.avif 480w, '
+        f'/assets/img/proj-{p["slug"]}-640.avif 640w, /assets/img/proj-{p["slug"]}-960.avif 960w" type="image/avif">'
+        f'<source sizes="(max-width:768px) 100vw, 480px" srcset="/assets/img/proj-{p["slug"]}-480.webp 480w, '
+        f'/assets/img/proj-{p["slug"]}-640.webp 640w, /assets/img/proj-{p["slug"]}-960.webp 960w" type="image/webp">'
+        f'<img alt="{p["alt"]}" decoding="async" height="602" loading="lazy" '
+        f'src="/assets/img/proj-{p["slug"]}-960.jpg" style="width:100%;height:100%;object-fit:cover;display:block" width="960">'
+        f'</picture></div>'
+        f'<div style="padding:22px 24px 26px">'
+        f'<span style="display:inline-block;font:700 11px var(--font-ui);letter-spacing:.12em;text-transform:uppercase;'
+        f'color:var(--color-forest);background:rgba(107,138,110,.2);border-radius:999px;padding:4px 11px">{p["live"]}</span>'
+        f'<h3 style="margin:14px 0 0;font:700 23px var(--font-display);color:var(--color-forest)">{p["name"]}</h3>'
+        f'<p style="margin:6px 0 0;font:400 14.5px/1.55 var(--font-ui);color:var(--color-charcoal)">{p["desc"]}</p>'
+        f'<div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">'
+        f'<div style="font:700 10.5px var(--font-ui);letter-spacing:.1em;text-transform:uppercase;color:var(--color-forest);'
+        f'opacity:.75">{p["chips"]}</div>'
+        f'<a href="{p["href"]}" rel="noopener" target="_blank" style="font:700 12.5px var(--font-ui);letter-spacing:.06em;'
+        f'text-transform:uppercase;color:var(--color-rust);text-decoration:none">{p["cta"]}</a>'
+        f'</div></div></div>'
+    )
+
+
+def build_proof_section(lang):
+    """A new homepage section: the two real, permissioned case studies,
+    placed right after the hero. The blueprint's own "Results / Proof"
+    section (09) was never actually built as a standalone homepage section
+    -- the two projects only lived on /program/. This closes that gap using
+    the same card pattern already shipped and approved there, so it's a
+    reuse, not a new visual language.
+    """
+    copy = PROOF_CARDS[lang]
+    program_href = "/program/" if lang == "en" else "/es/program/"
+    label_suffix = "" if lang == "en" else " (ES)"
+    cards_html = "".join(_proof_project_card_html(p) for p in copy["projects"])
+    html = (
+        f'<section data-reveal data-screen-label="02b Proof{label_suffix}" style="padding:clamp(56px,7vw,88px) clamp(20px,5vw,64px);'
+        f'border-top:1px solid var(--border-rule)">'
+        f'<div style="max-width:1240px;margin:0 auto">'
+        f'<div style="font:700 13px var(--font-ui);letter-spacing:.09em;color:var(--color-rust);text-align:center">{copy["eyebrow"]}</div>'
+        f'<h2 style="font:700 clamp(26px,3vw,36px)/1.15 var(--font-display);color:var(--color-forest);'
+        f'margin:12px auto 0;text-align:center">{copy["heading"]}</h2>'
+        f'<p style="font:400 16px/1.6 var(--font-ui);color:var(--text-body);max-width:60ch;margin:14px auto 0;text-align:center">'
+        f'{copy["sub"]}</p>'
+        f'<div data-reveal data-stagger style="margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px">'
+        f'{cards_html}</div>'
+        f'<div style="text-align:center;margin-top:28px">'
+        f'<a href="{program_href}" style="font:700 13px var(--font-ui);letter-spacing:.06em;color:var(--color-rust);'
+        f'text-decoration:underline;text-underline-offset:3px">{copy["link"]}</a></div>'
+        f'</div></section>'
+    )
+    return html
+
+
+def add_proof_section(soup, lang):
+    """Insert build_proof_section() right after the hero (02)."""
+    hero = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("02 Hero")})
+    if hero is None:
+        return
+    if soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("02b Proof")}) is not None:
+        return  # already patched
+    frag = BeautifulSoup(build_proof_section(lang), "html.parser")
+    hero.insert_after(frag)
+
+
+OREGON_BREAK_COPY = {
+    "en": {
+        "heading": "BUILT HERE. BUILT FOR HERE.",
+        "sub": ("From the Willamette Valley — Salem to Corvallis, Albany to Woodburn — "
+                "for the businesses that call it home."),
+    },
+    "es": {
+        "heading": "HECHO AQUÍ. HECHO PARA AQUÍ.",
+        "sub": ("Desde el Valle de Willamette — de Salem a Corvallis, de Albany a Woodburn — "
+                "para los negocios que lo llaman su hogar."),
+    },
+}
+
+
+def build_oregon_break_section(lang):
+    """A full-width illustrated/typographic pause between the deliverables
+    grid and the program timeline -- a visual breather using only CSS/SVG
+    (no new photo assets), matching the brand's illustration palette.
+    """
+    copy = OREGON_BREAK_COPY[lang]
+    svg = (
+        '<svg viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true" '
+        'style="position:absolute;inset:0;width:100%;height:100%">'
+        '<polygon points="0,200 0,120 220,40 460,140 700,60 950,150 1200,90 1200,200" '
+        'fill="var(--color-sage)" opacity=".22"></polygon>'
+        '<polygon points="0,200 0,160 300,90 620,170 900,100 1200,150 1200,200" '
+        'fill="var(--color-river)" opacity=".28"></polygon>'
+        '<path d="M0,190 C220,150 340,210 560,175 C780,140 900,195 1200,165 L1200,200 L0,200 Z" '
+        'fill="var(--color-gold)" opacity=".14"></path>'
+        '</svg>'
+    )
+    label_suffix = "" if lang == "en" else " (ES)"
+    html = (
+        f'<section data-reveal data-screen-label="05b Oregon break{label_suffix}" style="position:relative;overflow:hidden;'
+        'background:var(--color-forest);padding:clamp(72px,10vw,120px) clamp(20px,5vw,64px);text-align:center">'
+        f'{svg}'
+        '<div style="position:relative;max-width:760px;margin:0 auto">'
+        f'<h2 style="font:800 clamp(30px,5vw,58px)/1.1 var(--font-display);letter-spacing:.01em;color:var(--color-cream);'
+        f'margin:0">{copy["heading"]}</h2>'
+        f'<p style="font:400 16px/1.6 var(--font-ui);color:rgba(243,231,206,.8);max-width:52ch;margin:20px auto 0">'
+        f'{copy["sub"]}</p>'
+        '</div></section>'
+    )
+    return html
+
+
+def add_oregon_break_section(soup, lang):
+    """Insert build_oregon_break_section() between What's Included (05) and
+    the 30-Day Program timeline (06)."""
+    included = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("05 What's included")})
+    if included is None:
+        return
+    if soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("05b Oregon break")}) is not None:
+        return  # already patched
+    frag = BeautifulSoup(build_oregon_break_section(lang), "html.parser")
+    included.insert_after(frag)
+
+
 SERVICES_FOOTER_LABEL = {"en": "SERVICES", "es": "SERVICIOS"}
 
 
@@ -1711,6 +1977,11 @@ def main():
         add_service_area_nav(soup, lang, cfg)
         add_presence_check_card(soup, lang)
         add_track_record_card(soup, lang)
+        rebuild_scarcity_card(soup, lang)
+        remove_duplicate_scarcity_section(soup)
+        remove_cost_of_inaction_section(soup)
+        add_proof_section(soup, lang)
+        add_oregon_break_section(soup, lang)
         link_whats_included_to_services(soup, lang, cfg)
         link_program_page(soup, lang)
         link_services_hub(soup, lang, cfg)
