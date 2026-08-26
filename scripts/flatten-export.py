@@ -1540,64 +1540,6 @@ def add_proof_section(soup, lang):
     hero.insert_after(frag)
 
 
-OREGON_BREAK_COPY = {
-    "en": {
-        "heading": "BUILT HERE. BUILT FOR HERE.",
-        "sub": ("From the Willamette Valley — Salem to Corvallis, Albany to Woodburn — "
-                "for the businesses that call it home."),
-    },
-    "es": {
-        "heading": "HECHO AQUÍ. HECHO PARA AQUÍ.",
-        "sub": ("Desde el Valle de Willamette — de Salem a Corvallis, de Albany a Woodburn — "
-                "para los negocios que lo llaman su hogar."),
-    },
-}
-
-
-def build_oregon_break_section(lang):
-    """A full-width illustrated/typographic pause between the deliverables
-    grid and the program timeline -- a visual breather using only CSS/SVG
-    (no new photo assets), matching the brand's illustration palette.
-    """
-    copy = OREGON_BREAK_COPY[lang]
-    svg = (
-        '<svg viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true" '
-        'style="position:absolute;inset:0;width:100%;height:100%">'
-        '<polygon points="0,200 0,120 220,40 460,140 700,60 950,150 1200,90 1200,200" '
-        'fill="var(--color-sage)" opacity=".22"></polygon>'
-        '<polygon points="0,200 0,160 300,90 620,170 900,100 1200,150 1200,200" '
-        'fill="var(--color-river)" opacity=".28"></polygon>'
-        '<path d="M0,190 C220,150 340,210 560,175 C780,140 900,195 1200,165 L1200,200 L0,200 Z" '
-        'fill="var(--color-gold)" opacity=".14"></path>'
-        '</svg>'
-    )
-    label_suffix = "" if lang == "en" else " (ES)"
-    html = (
-        f'<section data-reveal data-screen-label="05b Oregon break{label_suffix}" style="position:relative;overflow:hidden;'
-        'background:var(--color-forest);padding:clamp(72px,10vw,120px) clamp(20px,5vw,64px);text-align:center">'
-        f'{svg}'
-        '<div style="position:relative;max-width:760px;margin:0 auto">'
-        f'<h2 style="font:800 clamp(30px,5vw,58px)/1.1 var(--font-display);letter-spacing:.01em;color:var(--color-cream);'
-        f'margin:0">{copy["heading"]}</h2>'
-        f'<p style="font:400 16px/1.6 var(--font-ui);color:rgba(243,231,206,.8);max-width:52ch;margin:20px auto 0">'
-        f'{copy["sub"]}</p>'
-        '</div></section>'
-    )
-    return html
-
-
-def add_oregon_break_section(soup, lang):
-    """Insert build_oregon_break_section() between What's Included (05) and
-    the 30-Day Program timeline (06)."""
-    included = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("05 What's included")})
-    if included is None:
-        return
-    if soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("05b Oregon break")}) is not None:
-        return  # already patched
-    frag = BeautifulSoup(build_oregon_break_section(lang), "html.parser")
-    included.insert_after(frag)
-
-
 SERVICES_FOOTER_LABEL = {"en": "SERVICES", "es": "SERVICIOS"}
 
 
@@ -1981,7 +1923,6 @@ def main():
         remove_duplicate_scarcity_section(soup)
         remove_cost_of_inaction_section(soup)
         add_proof_section(soup, lang)
-        add_oregon_break_section(soup, lang)
         link_whats_included_to_services(soup, lang, cfg)
         link_program_page(soup, lang)
         link_services_hub(soup, lang, cfg)
