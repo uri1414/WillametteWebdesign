@@ -18,6 +18,7 @@ pricing, or positioning copy.
 | Domain | `https://willametteweb.com` (apex canonical) |
 | Phone | (541) 497-9531 → `tel:+15414979531` |
 | Email | info@willametteweb.com |
+| Base city | Salem, OR — confirmed (was previously an unconfirmed guess of Albany; see history below) |
 
 All of the above live in **`site.config.json`**, which is the single source of
 truth. Change a value there, never inside a page. The audit script fails the
@@ -45,15 +46,23 @@ Section-by-section source of truth: `docs/FUNNEL-BLUEPRINT.md`.
 
 ## Facts that are NOT settled — do not invent them
 
-- **Base city.** Deliberately `null` in `site.config.json`. The homepage FAQ asks
-  "Do you work with businesses outside Albany?" and the (541) area code fits
-  Albany, so **Albany, OR is the likely base — but it is an inference**. A wrong
-  locality is a NAP mismatch against Google Business Profile. Confirm it before
-  adding a `LocalBusiness` `PostalAddress` or geo coordinates. Until then the
-  site says only "Based in Oregon" and the schema uses `areaServed` +
-  `addressRegion`, which is correct for a service-area business — including on
-  the six city pages, which each explicitly disclose the service-area model
-  (see below) rather than implying a storefront in that city.
+- **Base city — now confirmed: Salem, OR.** `site.config.json`'s
+  `nap.addressLocality` is `"Salem"`. This was previously left `null`: an
+  earlier guess inferred Albany from the (541) area code alone, which was
+  explicitly flagged as unconfirmed and never shipped. Salem is a real,
+  user-confirmed fact, not an inference — it's safe to state directly ("Based
+  in Salem, Oregon") anywhere on the site. `streetAddress`, `postalCode`, and
+  `geo.latitude`/`longitude` stay `null`: this is still a service-area
+  business with no public storefront, so schema pairs the city-level
+  `addressLocality` with `areaServed` rather than a full street address or
+  precise coordinates — never add those without an explicit ask. The
+  trust line and the "do you work outside X" FAQ are driven by
+  `set_base_city()` in `flatten-export.py`, reading `nap.addressLocality` —
+  change the city there, not by hand-editing generated HTML. The six city
+  pages each explicitly disclose this (service-area model, not a storefront
+  in that city, see below) — Salem's own city page states the base directly;
+  the other five name Salem as the base while explaining the program runs
+  identically for them.
 - **Guarantee, billing and ownership terms.** The `/terms/` page carries visible
   `NEEDS_REVIEW` callouts for every clause that depends on the signed client
   agreement, and it is `noindex` until they clear. See `docs/BUILD-NOTES.md`.

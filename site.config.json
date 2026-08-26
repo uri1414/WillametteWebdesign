@@ -21,11 +21,11 @@
     "phoneHref": "tel:+15414979531",
     "email": "info@willametteweb.com",
     "streetAddress": null,
-    "addressLocality": null,
+    "addressLocality": "Salem",
     "addressRegion": "OR",
     "postalCode": null,
     "addressCountry": "US",
-    "_todo": "addressLocality is still null on purpose. The homepage FAQ asks 'Do you work with businesses outside Albany?' and the (541) area code fits Albany, so Albany OR is the likely base -- but it is an inference, not a confirmed fact, and a wrong locality is a NAP mismatch against Google Business Profile. Confirm it, then set it here. Until then the site claims only 'Based in Oregon' and the schema uses areaServed + addressRegion, which is correct for a service-area business."
+    "_confirmed": "Salem, OR confirmed as the base city (previously an unconfirmed guess of Albany, based only on the 541 area code -- see CLAUDE.md history). streetAddress and postalCode stay null: still a service-area business with no public storefront, so schema pairs this city-level address with areaServed rather than a full PostalAddress."
   },
   "geo": {
     "latitude": null,

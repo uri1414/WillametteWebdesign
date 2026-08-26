@@ -48,11 +48,11 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Albany?",
-                    "We're a service-area business covering the Mid-Willamette "
-                    "Valley, not a storefront in any one city — the whole program "
-                    "is designed to run over calls, email, and a couple of video "
-                    "check-ins, so where we sit doesn't slow anything down for an "
-                    "Albany business.",
+                    "We're based in Salem, not Albany — but it's still a "
+                    "service-area program, not a storefront, so the whole thing "
+                    "runs over calls, email, and a couple of video check-ins. "
+                    "Where we sit doesn't slow anything down for an Albany "
+                    "business.",
                 ),
                 (
                     "How fast can an Albany business get a new site live?",
@@ -93,11 +93,10 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Albany?",
-                    "Somos un negocio de área de servicio que cubre el valle medio "
-                    "de Willamette, no una oficina física en una sola ciudad — todo "
-                    "el programa está diseñado para funcionar por llamadas, correo y "
-                    "un par de videollamadas, así que dónde estemos no retrasa nada "
-                    "para un negocio en Albany.",
+                    "Tenemos base en Salem, no en Albany — pero sigue siendo un "
+                    "programa de área de servicio, no una oficina física, así que "
+                    "todo funciona por llamadas, correo y un par de videollamadas. "
+                    "Dónde estemos no retrasa nada para un negocio en Albany.",
                 ),
                 (
                     "¿Qué tan rápido puede un negocio de Albany tener su sitio "
@@ -142,10 +141,9 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Corvallis?",
-                    "No — we're a service-area business covering the Mid-Willamette "
-                    "Valley. The program runs by call, email, and video, so a "
-                    "Corvallis business gets the same attention as if we had an "
-                    "office downtown.",
+                    "No — we're based in Salem, not Corvallis. The program runs "
+                    "by call, email, and video, so a Corvallis business gets the "
+                    "same attention as if we had an office downtown.",
                 ),
                 (
                     "Can you compete with the design quality Corvallis customers "
@@ -187,10 +185,10 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Corvallis?",
-                    "No — somos un negocio de área de servicio que cubre el valle "
-                    "medio de Willamette. El programa funciona por llamada, correo "
-                    "y video, así que un negocio en Corvallis recibe la misma "
-                    "atención que si tuviéramos oficina en el centro.",
+                    "No — tenemos base en Salem, no en Corvallis. El programa "
+                    "funciona por llamada, correo y video, así que un negocio en "
+                    "Corvallis recibe la misma atención que si tuviéramos oficina "
+                    "en el centro.",
                 ),
                 (
                     "¿Pueden igualar la calidad de diseño que esperan los clientes "
@@ -238,10 +236,11 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Salem?",
-                    "No — we're a service-area business covering the Mid-Willamette "
-                    "Valley, and the whole program runs over calls, email, and a "
-                    "couple of video check-ins, so a Salem business gets full "
-                    "attention without needing us to have a local office.",
+                    "Yes — Salem is our home base, though we still run as a "
+                    "service-area business with no public storefront, so the "
+                    "program works the same way for you as for a business "
+                    "anywhere else in the valley: by call, email, and a couple of "
+                    "video check-ins.",
                 ),
                 (
                     "Is the Spanish version a real translation, not just Google "
@@ -282,10 +281,11 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Salem?",
-                    "No — somos un negocio de área de servicio que cubre el valle "
-                    "medio de Willamette, y todo el programa funciona por "
-                    "llamadas, correo y videollamadas, así que un negocio en Salem "
-                    "recibe atención completa sin que necesitemos oficina local.",
+                    "Sí — Salem es nuestra base, aunque seguimos funcionando "
+                    "como un negocio de área de servicio sin oficina pública, así "
+                    "que el programa funciona igual para ti que para un negocio "
+                    "en cualquier otra parte del valle: por llamadas, correo y un "
+                    "par de videollamadas.",
                 ),
                 (
                     "¿La versión en español es una traducción real, no solo Google "
@@ -332,10 +332,10 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Lebanon?",
-                    "We're a service-area business covering the Mid-Willamette "
-                    "Valley, not a storefront in one town — the program runs by "
-                    "call, email, and video, so a Lebanon business gets the same "
-                    "attention as anywhere else in the valley.",
+                    "We're based in Salem, not Lebanon — but it's still a "
+                    "service-area program, not a storefront in town, so it runs "
+                    "by call, email, and video and a Lebanon business gets the "
+                    "same attention as anywhere else in the valley.",
                 ),
                 (
                     "We're a small, family-run business — is the program still a "
@@ -377,11 +377,11 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Lebanon?",
-                    "Somos un negocio de área de servicio que cubre el valle medio "
-                    "de Willamette, no una oficina en un solo pueblo — el programa "
-                    "funciona por llamada, correo y video, así que un negocio en "
-                    "Lebanon recibe la misma atención que en cualquier otra parte "
-                    "del valle.",
+                    "Tenemos base en Salem, no en Lebanon — pero sigue siendo un "
+                    "programa de área de servicio, no una oficina en el pueblo, "
+                    "así que funciona por llamada, correo y video, y un negocio "
+                    "en Lebanon recibe la misma atención que en cualquier otra "
+                    "parte del valle.",
                 ),
                 (
                     "Somos un negocio familiar pequeño — ¿el programa nos sirve?",
@@ -429,10 +429,10 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Keizer?",
-                    "We're a service-area business covering the Mid-Willamette "
-                    "Valley, not a storefront in one city — the program runs by "
-                    "call, email, and video, so a Keizer business gets full "
-                    "attention without us needing a local office.",
+                    "We're based in Salem, not Keizer specifically — but it's "
+                    "still a service-area program, not a storefront, so it runs "
+                    "by call, email, and video and a Keizer business gets full "
+                    "attention without us needing a local office there.",
                 ),
                 (
                     "Most of our customers search for \"Salem\" businesses — does a "
@@ -477,11 +477,11 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Keizer?",
-                    "Somos un negocio de área de servicio que cubre el valle medio "
-                    "de Willamette, no una oficina en una sola ciudad — el programa "
-                    "funciona por llamada, correo y video, así que un negocio en "
-                    "Keizer recibe atención completa sin que necesitemos oficina "
-                    "local.",
+                    "Tenemos base en Salem, no en Keizer específicamente — pero "
+                    "sigue siendo un programa de área de servicio, no una oficina "
+                    "física, así que funciona por llamada, correo y video, y un "
+                    "negocio en Keizer recibe atención completa sin que "
+                    "necesitemos oficina local ahí.",
                 ),
                 (
                     "La mayoría de nuestros clientes buscan negocios de \"Salem\" — "
@@ -530,10 +530,10 @@ CITIES = [
             "faq": [
                 (
                     "Is Willamette Web Design based in Woodburn?",
-                    "We're a service-area business covering the Mid-Willamette "
-                    "Valley, not a storefront in one city — the program runs by "
-                    "call, email, and video, so a Woodburn business gets full "
-                    "attention without us needing a local office.",
+                    "We're based in Salem, not Woodburn — but it's still a "
+                    "service-area program, not a storefront, so it runs by call, "
+                    "email, and video and a Woodburn business gets full attention "
+                    "without us needing a local office there.",
                 ),
                 (
                     "Is the Spanish site a real translation, not just Google "
@@ -579,11 +579,11 @@ CITIES = [
             "faq": [
                 (
                     "¿Willamette Web Design tiene oficina en Woodburn?",
-                    "Somos un negocio de área de servicio que cubre el valle medio "
-                    "de Willamette, no una oficina en una sola ciudad — el programa "
-                    "funciona por llamada, correo y video, así que un negocio en "
-                    "Woodburn recibe atención completa sin que necesitemos oficina "
-                    "local.",
+                    "Tenemos base en Salem, no en Woodburn — pero sigue siendo un "
+                    "programa de área de servicio, no una oficina física, así que "
+                    "funciona por llamada, correo y video, y un negocio en "
+                    "Woodburn recibe atención completa sin que necesitemos "
+                    "oficina local ahí.",
                 ),
                 (
                     "¿El sitio en español es una traducción real, no solo Google "

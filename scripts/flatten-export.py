@@ -831,6 +831,60 @@ def fix_unverified_claims(soup, lang, notes):
         break
 
 
+BASE_CITY_OUTSIDE_FAQ = {
+    "en": {
+        "q": "Do you work with businesses outside {city}?",
+        "a": "Yes — {others} too, in person or remotely.",
+    },
+    "es": {
+        "q": "¿Trabajan con negocios fuera de {city}?",
+        "a": "Sí — {others} también, en persona o de forma remota.",
+    },
+}
+
+
+def set_base_city(soup, lang, cfg):
+    """Name the confirmed base city in the two places the export hardcodes a
+    guess (Albany) or a placeholder ("Based in Oregon").
+
+    site.config.json's nap.addressLocality is null until the base city is
+    actually confirmed -- see CLAUDE.md's "Base city" note. Once it is, this
+    keeps the trust line and the "do you work outside X" FAQ in sync with it
+    instead of leaving stale copy that names the wrong city or none at all.
+    """
+    city = (cfg.get("nap") or {}).get("addressLocality")
+    if not city:
+        return
+
+    trust_needle = "BASED IN OREGON" if lang == "en" else "CON BASE EN OREGON"
+    trust_replacement = f"BASED IN {city.upper()}, OREGON" if lang == "en" else f"CON BASE EN {city.upper()}, OREGON"
+    for span in soup.find_all("span"):
+        if span.string and span.string.strip() == trust_needle:
+            span.string = trust_replacement
+            break
+
+    other_cities = [c for c in (cfg.get("serviceArea") or {}).get("cities") or [] if c != city]
+    if not other_cities:
+        return
+    copy = BASE_CITY_OUTSIDE_FAQ[lang]
+    others = (", ".join(other_cities[:-1]) + (" y " if lang == "es" else " and ") + other_cities[-1]
+              if len(other_cities) > 1 else other_cities[0])
+    for det in soup.find_all("details"):
+        summary = det.find("summary")
+        if summary is None:
+            continue
+        # The question text is the summary's leading text node, before the
+        # +/- indicator spans.
+        for content in summary.contents:
+            if isinstance(content, str) and content.strip():
+                if "outside Albany" in content or "fuera de Albany" in content:
+                    content.replace_with(copy["q"].format(city=city))
+                    body = det.find("p")
+                    if body is not None:
+                        body.string = copy["a"].format(others=others)
+                break
+
+
 def wire_contact_and_legal(soup, lang, cfg):
     """Insert the approved NAP and point the footer legal links at real pages."""
     nap = cfg["nap"]
@@ -1328,6 +1382,7 @@ def build_head(lang, cfg, css, faqs=None):
         "areaServed": area_served,
         "address": {
             "@type": "PostalAddress",
+            **({"addressLocality": nap["addressLocality"]} if nap.get("addressLocality") else {}),
             "addressRegion": "OR",
             "addressCountry": "US",
         },
@@ -1503,6 +1558,7 @@ def main():
         resolve_hovers(soup, set())
         fix_unverified_claims(soup, lang, notes)
         wire_contact_and_legal(soup, lang, cfg)
+        set_base_city(soup, lang, cfg)
         link_service_area(soup, lang, cfg)
         add_service_area_nav(soup, lang, cfg)
         add_presence_check_card(soup, lang)
