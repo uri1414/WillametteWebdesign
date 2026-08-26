@@ -1272,6 +1272,46 @@ def add_track_record_card(soup, lang):
     grid.append(card)
 
 
+PROGRAM_PAGE_LABEL = {
+    "en": "See the full program, week by week →",
+    "es": "Ve el programa completo, semana por semana →",
+}
+PROGRAM_PAGE_FOOTER_LABEL = {"en": "THE PROGRAM", "es": "EL PROGRAMA"}
+
+
+def link_program_page(soup, lang):
+    """Link the homepage's own timeline to the standalone /program/ page,
+    and add it to the footer's page-link column.
+
+    /program/ (build-program-page.py) is a deeper walkthrough of the same
+    4-step timeline this section already shows -- for someone who wants the
+    week-by-week detail (what happens, which listings get connected, the
+    real case studies) before applying.
+    """
+    program_path = "/program/" if lang == "en" else "/es/program/"
+
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("06 30-Day Program")})
+    if section is not None:
+        timeline = section.select_one('div[style*="margin-top:44px"]')
+        if timeline is not None and timeline.parent is not None:
+            a = soup.new_tag("a", href=program_path)
+            a["style"] = ("display:inline-block;margin-top:28px;font:700 13px var(--font-ui);"
+                          "letter-spacing:.06em;color:var(--color-rust);text-decoration:underline;"
+                          "text-underline-offset:3px")
+            a.string = PROGRAM_PAGE_LABEL[lang]
+            timeline.insert_after(a)
+
+    footer = soup.find("footer")
+    if footer is not None:
+        about_a = footer.find("a", href="#about")
+        if about_a is not None and about_a.parent is not None:
+            program_a = soup.new_tag("a", href=program_path, **{"class": "h-gold nav-link"})
+            program_a["style"] = ("font:700 12px var(--font-ui);letter-spacing:.08em;"
+                                  "color:var(--color-cream);text-decoration:none")
+            program_a.string = PROGRAM_PAGE_FOOTER_LABEL[lang]
+            about_a.insert_after(program_a)
+
+
 def fix_orphan_apply_button(soup):
     """The Final CTA's Apply button has no destination -- fix it.
 
@@ -1563,6 +1603,7 @@ def main():
         add_service_area_nav(soup, lang, cfg)
         add_presence_check_card(soup, lang)
         add_track_record_card(soup, lang)
+        link_program_page(soup, lang)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)

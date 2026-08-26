@@ -64,6 +64,7 @@ website address, and email.
 
 - [Home (English)](https://willametteweb.com/)
 - [Inicio (Español)](https://willametteweb.com/es/)
+- [The Willamette 30-Day Program](https://willametteweb.com/program/) / [Español](https://willametteweb.com/es/program/)
 - [Service Areas](https://willametteweb.com/service-areas/) / [Español](https://willametteweb.com/es/service-areas/)
 - [Web Design in Albany, OR](https://willametteweb.com/web-design-albany-or/) / [Español](https://willametteweb.com/es/web-design-albany-or/)
 - [Web Design in Corvallis, OR](https://willametteweb.com/web-design-corvallis-or/) / [Español](https://willametteweb.com/es/web-design-corvallis-or/)

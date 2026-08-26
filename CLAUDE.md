@@ -241,6 +241,14 @@ service-areas/         Valley-wide hub page, EN + ES — GENERATED. Links every
                       city page above plus honestly covers towns that don't
                       have one; see SEO-PLAYBOOK.md §2 before adding more
                       dedicated city pages instead of using this hub.
+program/                The Willamette 30-Day Program page, EN + ES —
+                      GENERATED. Week-by-week roadmap, the guarantee + real
+                      5-businesses-per-round cap, and two permissioned real
+                      case studies (Albany Pro Cleaning, Albany Junk
+                      Removal — see CLAUDE.md's "Proof" note before adding
+                      a third or changing the cap). Linked from the
+                      homepage's own "How It Works" timeline and the
+                      footer.
 scripts/
   audit.mjs           The handbook, executable. Gates the deploy.
   flatten-export.py   Design-tool export -> static EN + ES homepage
@@ -255,6 +263,11 @@ scripts/
                       built homepage's header/footer, so after
                       flatten-export.py; order relative to
                       build-city-pages.py doesn't matter
+  build-program-page.py  The /program/ page — hand-built from the owner's
+                      design export (design/source-art/proj-*.png,
+                      program-hero-bg.png), not a generic template like
+                      the city pages. Also reuses the homepage's
+                      header/footer, so after flatten-export.py.
   build_lib.py        extract_faqs(), minify_css(), load_chrome() +
                       rewrite_chrome_links() (reuse the homepage header/
                       footer), service_areas_path() — shared by the
@@ -292,6 +305,7 @@ python3 scripts/flatten-export.py <export.html>   # homepage EN + ES — run fir
 python3 scripts/build-legal.py                    # privacy + terms, EN + ES
 python3 scripts/build-city-pages.py                # city pages — needs the homepage's header/footer, so after flatten-export.py
 python3 scripts/build-service-areas.py             # /service-areas/ hub — also needs the homepage's header/footer
+python3 scripts/build-program-page.py              # /program/ page — also needs the homepage's header/footer
 npm run preflight
 ```
 
