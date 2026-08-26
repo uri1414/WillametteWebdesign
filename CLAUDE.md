@@ -249,6 +249,21 @@ program/                The Willamette 30-Day Program page, EN + ES —
                       a third or changing the cap). Linked from the
                       homepage's own "How It Works" timeline and the
                       footer.
+services/               SEO-PLAYBOOK.md section 1: one page per service
+                      someone actually searches for individually (website
+                      design, local SEO, Google Business Profile setup,
+                      local listings & citations, social media setup),
+                      EN + ES — GENERATED. None sell standalone — there is
+                      no per-service price anywhere in site.config.json,
+                      only the $799 program — so every page's closing
+                      section is an honest upsell into the 30-Day Program,
+                      not a fake add-to-cart. Plus a /services/ hub
+                      (ItemList) linking all five. Linked from the header's
+                      Services dropdown, the footer, and the homepage's
+                      "What's Included" cards (the first 5 of 8 — lead
+                      capture, analytics, and ongoing support don't have
+                      dedicated pages, see site.config.json's servicePages
+                      comment for why).
 scripts/
   audit.mjs           The handbook, executable. Gates the deploy.
   flatten-export.py   Design-tool export -> static EN + ES homepage
@@ -306,6 +321,7 @@ python3 scripts/build-legal.py                    # privacy + terms, EN + ES
 python3 scripts/build-city-pages.py                # city pages — needs the homepage's header/footer, so after flatten-export.py
 python3 scripts/build-service-areas.py             # /service-areas/ hub — also needs the homepage's header/footer
 python3 scripts/build-program-page.py              # /program/ page — also needs the homepage's header/footer
+python3 scripts/build-service-pages.py              # /services/ pages + hub — also needs the homepage's header/footer
 npm run preflight
 ```
 

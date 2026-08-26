@@ -37,7 +37,13 @@ import sys
 
 from bs4 import BeautifulSoup
 
-from build_lib import extract_faqs, minify_css, service_areas_path
+from build_lib import (
+    extract_faqs,
+    minify_css,
+    service_areas_path,
+    service_page_path,
+    services_hub_path,
+)
 
 # Asset id -> the path it becomes in the repo. Ids come from the export's
 # manifest; anything not listed here is reported so it can't be silently lost.
@@ -1061,6 +1067,60 @@ def link_service_area(soup, lang, cfg):
     parent.append(hub)
 
 
+NAV_SERVICES_LABEL = {"en": "SERVICES", "es": "SERVICIOS"}
+NAV_ALL_SERVICES_LABEL = {"en": "All services", "es": "Todos los servicios"}
+
+
+def add_services_nav(soup, lang, cfg):
+    """Add the "Services" dropdown SEO-PLAYBOOK.md sec.1 step 6 calls for.
+
+    Mirrors add_service_area_nav() below exactly -- same <details> pattern,
+    same insertion point (just before the language switch). Called before
+    add_service_area_nav() in main() so the header nav reads SERVICES, then
+    SERVICE AREAS, then the language switch: each dropdown inserts itself
+    immediately before the switch, so whichever runs second ends up closer
+    to it.
+    """
+    pages = (cfg.get("servicePages") or {}).get("pages") or []
+    header = soup.find("header")
+    if header is None or not pages:
+        return
+
+    label = NAV_SERVICES_LABEL[lang]
+
+    def build_dropdown():
+        dd = soup.new_tag("details", **{"class": "nav-dropdown"})
+        summary = soup.new_tag("summary")
+        summary.string = label
+        dd.append(summary)
+        menu = soup.new_tag("div", **{"class": "nav-dropdown__menu"})
+        for page in pages:
+            a = soup.new_tag("a", href=service_page_path(lang, page["slug"]))
+            a.string = page["name"]
+            menu.append(a)
+        all_services = soup.new_tag("a", href=services_hub_path(lang), **{"class": "nav-dropdown__all"})
+        all_services.string = NAV_ALL_SERVICES_LABEL[lang]
+        menu.append(all_services)
+        dd.append(menu)
+        return dd
+
+    desktop_nav = header.select_one(".u-desktop nav")
+    if desktop_nav is not None:
+        lang_a = desktop_nav.find("a", class_="lang-switch")
+        if lang_a is not None and lang_a.parent is not None:
+            lang_a.parent.insert_before(build_dropdown())
+        else:
+            desktop_nav.append(build_dropdown())
+
+    drawer_nav = header.find("nav", class_="drawer")
+    if drawer_nav is not None:
+        lang_a = drawer_nav.find("a", class_="lang-switch")
+        if lang_a is not None:
+            lang_a.insert_before(build_dropdown())
+        else:
+            drawer_nav.append(build_dropdown())
+
+
 NAV_SERVICE_AREA_LABEL = {"en": "SERVICE AREAS", "es": "ÁREAS DE SERVICIO"}
 NAV_ALL_AREAS_LABEL = {"en": "All service areas", "es": "Todas las áreas"}
 
@@ -1270,6 +1330,53 @@ def add_track_record_card(soup, lang):
     card.append(icon)
     card.append(text)
     grid.append(card)
+
+
+SERVICES_FOOTER_LABEL = {"en": "SERVICES", "es": "SERVICIOS"}
+
+
+def link_whats_included_to_services(soup, lang, cfg):
+    """Turn the first five "What's Included" cards into links to their
+    dedicated /services/<slug>/ pages.
+
+    Before this, each service was named once in a three-word card with no
+    link in or out anywhere on the homepage -- exactly the internal-linking
+    gap SEO-PLAYBOOK.md section 1 step 6 calls for closing. The cards are in
+    the same order as site.config.json's servicePages.pages list, so this
+    maps by position rather than matching translated heading text.
+    """
+    section = soup.find(attrs={"data-screen-label": lambda v: v and v.startswith("05 What's included")})
+    if section is None:
+        return
+    pages = (cfg.get("servicePages") or {}).get("pages") or []
+    grid = section.select_one('div[style*="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))"]')
+    if grid is None:
+        return
+    cards = grid.find_all("div", recursive=False)
+    for card, page in zip(cards, pages):
+        card.name = "a"
+        card["href"] = service_page_path(lang, page["slug"])
+        style = card.get("style", "")
+        card["style"] = style + ";text-decoration:none;cursor:pointer"
+
+
+def link_services_hub(soup, lang, cfg):
+    """Add the /services/ hub to the footer's page-link column, right after
+    About -- see link_program_page() below for why it lands there (each
+    insert_after(about_a) pushes the previous insertion further down, so
+    call order controls footer order; this runs after link_program_page in
+    main() so the footer reads ABOUT, SERVICES, THE PROGRAM)."""
+    footer = soup.find("footer")
+    if footer is None:
+        return
+    about_a = footer.find("a", href="#about")
+    if about_a is None or about_a.parent is None:
+        return
+    services_a = soup.new_tag("a", href=services_hub_path(lang), **{"class": "h-gold nav-link"})
+    services_a["style"] = ("font:700 12px var(--font-ui);letter-spacing:.08em;"
+                           "color:var(--color-cream);text-decoration:none")
+    services_a.string = SERVICES_FOOTER_LABEL[lang]
+    about_a.insert_after(services_a)
 
 
 PROGRAM_PAGE_LABEL = {
@@ -1600,10 +1707,13 @@ def main():
         wire_contact_and_legal(soup, lang, cfg)
         set_base_city(soup, lang, cfg)
         link_service_area(soup, lang, cfg)
+        add_services_nav(soup, lang, cfg)
         add_service_area_nav(soup, lang, cfg)
         add_presence_check_card(soup, lang)
         add_track_record_card(soup, lang)
+        link_whats_included_to_services(soup, lang, cfg)
         link_program_page(soup, lang)
+        link_services_hub(soup, lang, cfg)
         promote_card_headings(soup)
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)

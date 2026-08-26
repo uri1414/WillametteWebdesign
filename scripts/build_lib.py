@@ -95,6 +95,17 @@ def service_areas_path(lang):
     return "/service-areas/" if lang == "en" else "/es/service-areas/"
 
 
+def services_hub_path(lang):
+    """URL of the /services/ hub page -- same slug convention as
+    service_areas_path()."""
+    return "/services/" if lang == "en" else "/es/services/"
+
+
+def service_page_path(lang, slug):
+    """URL of a single /services/<slug>/ page."""
+    return f"/services/{slug}/" if lang == "en" else f"/es/services/{slug}/"
+
+
 def minify_css(css):
     css = re.sub(r"/\*(?!!)[\s\S]*?\*/", "", css)
     css = re.sub(r"\s+", " ", css)

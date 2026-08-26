@@ -96,6 +96,16 @@
     "Analytics and conversion tracking",
     "Ongoing support and management"
   ],
+  "servicePages": {
+    "$comment": "SEO-PLAYBOOK.md section 1: one dedicated page per service someone would actually search for individually, at /services/<slug>/. Deliberately a subset of the 8-item list above -- lead capture, analytics, and ongoing support don't have real standalone search intent, so they're mentioned inside these pages ('what's included') rather than getting three thin pages of their own. None of these sell standalone: every page funnels to the $799 Willamette 30-Day Program, since that's the only real price that exists.",
+    "pages": [
+      { "slug": "website-design", "name": "Website Design" },
+      { "slug": "local-seo", "name": "Local SEO" },
+      { "slug": "google-business-profile", "name": "Google Business Profile Setup" },
+      { "slug": "local-listings-citations", "name": "Local Listings & Citations" },
+      { "slug": "social-media-setup", "name": "Social Media Setup" }
+    ]
+  },
   "forms": {
     "$comment": "The free presence check form is the funnel's soft-conversion path. It is wired to Netlify Forms: Netlify detects the form in the deployed HTML and captures POSTs to '/', so there is no backend to run. It only works on a Netlify deploy — locally the POST fails and site.js shows the phone-number fallback, which is correct behaviour, not a bug.",
     "provider": "netlify-forms",

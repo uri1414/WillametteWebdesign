@@ -13,6 +13,15 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://willametteweb.com/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://willametteweb.com/es/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/"/>
@@ -130,6 +139,15 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://willametteweb.com/es/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://willametteweb.com/es/web-design-albany-or/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/web-design-albany-or/"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/web-design-albany-or/"/>
@@ -182,5 +200,95 @@
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/services/google-business-profile/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/google-business-profile/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/google-business-profile/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/google-business-profile/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/services/local-listings-citations/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/local-listings-citations/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/local-listings-citations/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/local-listings-citations/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/services/local-seo/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/local-seo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/local-seo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/local-seo/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/services/social-media-setup/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/social-media-setup/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/social-media-setup/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/social-media-setup/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/services/website-design/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/website-design/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/website-design/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/website-design/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/services/google-business-profile/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/google-business-profile/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/google-business-profile/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/google-business-profile/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/services/local-listings-citations/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/local-listings-citations/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/local-listings-citations/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/local-listings-citations/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/services/local-seo/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/local-seo/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/local-seo/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/local-seo/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/services/social-media-setup/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/social-media-setup/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/social-media-setup/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/social-media-setup/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://willametteweb.com/es/services/website-design/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://willametteweb.com/services/website-design/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://willametteweb.com/es/services/website-design/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://willametteweb.com/services/website-design/"/>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
