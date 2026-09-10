@@ -56,11 +56,11 @@ IMAGE_MAP = {
 # Responsive derivatives produced by scripts/optimize-images.mjs.
 IMAGE_WIDTHS = {
     "valley-hero": [640, 960, 1280, 1717],
-    "logo-badge": [46, 92, 138],
+    "logo-badge": [46, 92, 138, 220],
     "program-badge": [320, 640],
 }
 IMAGE_FALLBACK_EXT = {"valley-hero": "jpg", "logo-badge": "png", "program-badge": "png"}
-IMAGE_INTRINSIC = {"valley-hero": (1717, 916), "logo-badge": (138, 138), "program-badge": (640, 427)}
+IMAGE_INTRINSIC = {"valley-hero": (1717, 916), "logo-badge": (220, 220), "program-badge": (640, 427)}
 
 
 
@@ -516,8 +516,8 @@ def add_hero_brand_badge(soup, lang):
     if hero_media.find("div", class_="hero-badge") is not None:
         return  # already patched
 
-    markup = picture_for("logo-badge", sizes="76px", alt="",
-                          style="width:76px;height:76px", lazy=False)
+    markup = picture_for("logo-badge", sizes="112px", alt="",
+                          style="width:112px;height:112px", lazy=False)
     frag = BeautifulSoup(f'<div class="hero-badge">{markup}</div>', "html.parser")
     hero_media.insert(0, frag)
 
