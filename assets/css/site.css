@@ -593,6 +593,22 @@ details[open] summary{color:#D5683C !important}
    div, so hiding it on mobile costs nothing. */
 .hero-media > div { display: none; }
 
+/* The illustration itself is composed with open sky on its left third (room
+   for the gradient + copy on desktop) -- on mobile, with no text overlaid on
+   the image, that open area just reads as blank cream. The brand badge fills
+   it instead of leaving it empty. Desktop doesn't need this: the copy column
+   already sits over that same space there. Higher specificity than
+   `.hero-media > div` above (two classes vs. one class + one type) so it wins
+   without needing !important, in both directions. */
+.hero-media .hero-badge {
+  display: block;
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  z-index: 1;
+  filter: drop-shadow(0 2px 6px rgba(41, 37, 31, .18));
+}
+
 @media (min-width: 861px) {
   .hero-media img {
     position: absolute;
@@ -604,4 +620,5 @@ details[open] summary{color:#D5683C !important}
     pointer-events: none;
   }
   .hero-media > div { display: block; }
+  .hero-media .hero-badge { display: none; }
 }

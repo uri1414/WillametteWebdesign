@@ -499,6 +499,29 @@ def dedupe_hero(soup):
         mobile.decompose()
 
 
+def add_hero_brand_badge(soup, lang):
+    """Add the circular logo badge into the hero illustration's blank area.
+
+    The valley illustration is composed with open sky on its left third --
+    room for the gradient-fade + copy column on desktop. On mobile there's no
+    text over the image, so that reserved space just reads as blank cream
+    (confirmed by screenshot, not a CSS bug: object-fit:cover already fills
+    the box, the artwork itself has the empty area). `.hero-media .hero-badge`
+    in site.css shows this only under 861px and hides it above -- desktop's
+    copy column already sits over that same space, so it doesn't need it too.
+    """
+    hero_media = soup.find("div", class_="hero-media")
+    if hero_media is None:
+        return
+    if hero_media.find("div", class_="hero-badge") is not None:
+        return  # already patched
+
+    markup = picture_for("logo-badge", sizes="76px", alt="",
+                          style="width:76px;height:76px", lazy=False)
+    frag = BeautifulSoup(f'<div class="hero-badge">{markup}</div>', "html.parser")
+    hero_media.insert(0, frag)
+
+
 def swap_images(soup, lang):
     swap_images._logo_count = 0
     """Raw asset ids -> responsive <picture> with AVIF/WebP and real dimensions."""
@@ -1930,6 +1953,7 @@ def main():
         add_missing_section_heading(soup, lang)
         announce_presence_success(soup)
         dedupe_hero(soup)
+        add_hero_brand_badge(soup, lang)
         swap_images(soup, lang)
         add_motion(soup)
 
